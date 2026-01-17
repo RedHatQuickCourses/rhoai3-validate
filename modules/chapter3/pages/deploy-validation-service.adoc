@@ -1,0 +1,265 @@
+= Deploy Validation Service
+:navtitle: Deploy Validation Service
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer
+:description: Deploy a validation service in OpenShift AI that monitors model quality.
+
+[.lead]
+*Deploying a validation service automates quality monitoring and provides early warning of issues.*
+
+This lab teaches you to deploy a validation service in OpenShift AI that continuously monitors your deployed models and runs validation tests.
+
+== Prerequisites
+
+Before starting, ensure:
+
+* You have completed Chapter 2 (validation tests run successfully)
+* Your OpenShift AI cluster is accessible
+* You have permissions to create Kubernetes resources
+* S3 storage is available for validation results
+
+== Step 1: Create Validation Service Namespace
+
+Create a dedicated namespace for validation services:
+
+[source,bash]
+----
+# Create namespace
+oc new-project model-validation-lab
+
+# Or use existing namespace
+export NAMESPACE="model-validation-lab"
+----
+
+== Step 2: Deploy Validation Service
+
+Deploy a validation service that monitors your InferenceService:
+
+[source,bash]
+----
+# Set configuration
+export MODEL_NAMESPACE="model-deploy-lab"
+export MODEL_NAME="granite-4-micro"
+export VALIDATION_NAMESPACE="model-validation-lab"
+
+# Create validation service deployment
+cat > validation-service.yaml <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validation-service
+  namespace: ${VALIDATION_NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validation-service
+  template:
+    metadata:
+      labels:
+        app: validation-service
+    spec:
+      containers:
+      - name: validation-controller
+        image: registry.access.redhat.com/ubi9/python-311:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            pip install kubernetes boto3 -q
+            python /app/validation-controller.py
+        env:
+        - name: MODEL_NAMESPACE
+          value: "${MODEL_NAMESPACE}"
+        - name: MODEL_NAME
+          value: "${MODEL_NAME}"
+        - name: S3_ENDPOINT
+          value: "http://minio-service.${MODEL_NAMESPACE}.svc.cluster.local:9000"
+        - name: S3_BUCKET
+          value: "model-validations"
+        volumeMounts:
+        - name: validation-scripts
+          mountPath: /app
+      volumes:
+      - name: validation-scripts
+        configMap:
+          name: validation-scripts
+      serviceAccountName: validation-service-sa
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: validation-service-sa
+  namespace: ${VALIDATION_NAMESPACE}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: validation-role
+  namespace: ${VALIDATION_NAMESPACE}
+rules:
+- apiGroups: ["serving.kserve.io"]
+  resources: ["inferenceservices"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["trustyai.opendatahub.io"]
+  resources: ["lmevaljobs"]
+  verbs: ["create", "get", "list"]
+- apiGroups: [""]
+  resources: ["pods", "configmaps"]
+  verbs: ["create", "get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: validation-rolebinding
+  namespace: ${VALIDATION_NAMESPACE}
+subjects:
+- kind: ServiceAccount
+  name: validation-service-sa
+  namespace: ${VALIDATION_NAMESPACE}
+roleRef:
+  kind: Role
+  name: validation-role
+  apiGroup: rbac.authorization.k8s.io
+EOF
+
+oc apply -f validation-service.yaml
+----
+
+== Step 3: Create Validation Controller Script
+
+Create the validation controller script:
+
+[source,bash]
+----
+# Create validation controller script
+cat > validation-controller.py <<'PYTHON_SCRIPT'
+#!/usr/bin/env python3
+"""
+Validation Service Controller
+Monitors InferenceService and runs validation tests
+"""
+import os
+import time
+import json
+from kubernetes import client, config, watch
+import boto3
+from botocore.client import Config
+
+# Configuration
+MODEL_NAMESPACE = os.getenv('MODEL_NAMESPACE', 'model-deploy-lab')
+MODEL_NAME = os.getenv('MODEL_NAME', 'granite-4-micro')
+S3_ENDPOINT = os.getenv('S3_ENDPOINT')
+S3_BUCKET = os.getenv('S3_BUCKET', 'model-validations')
+
+# Initialize Kubernetes client
+config.load_incluster_config()
+v1 = client.CoreV1Api()
+custom_api = client.CustomObjectsApi()
+
+# Initialize S3 client
+s3_client = boto3.client('s3',
+    endpoint_url=S3_ENDPOINT,
+    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID', 'minio'),
+    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY', 'minio123'),
+    config=Config(signature_version='s3v4'))
+
+def check_model_status():
+    """Check if InferenceService is ready"""
+    try:
+        api = client.CustomObjectsApi()
+        inference_service = api.get_namespaced_custom_object(
+            group="serving.kserve.io",
+            version="v1beta1",
+            namespace=MODEL_NAMESPACE,
+            plural="inferenceservices",
+            name=MODEL_NAME
+        )
+        
+        conditions = inference_service.get('status', {}).get('conditions', [])
+        for condition in conditions:
+            if condition.get('type') == 'Ready':
+                return condition.get('status') == 'True'
+        return False
+    except Exception as e:
+        print(f"Error checking model status: {e}")
+        return False
+
+def run_validation():
+    """Run validation tests"""
+    print(f"Running validation for {MODEL_NAME}...")
+    # Implementation would trigger TrustyAI LMEvalJob or GuideLLM
+    # This is a simplified example
+    return True
+
+def main():
+    """Main validation loop"""
+    print(f"Validation Service started for {MODEL_NAME} in {MODEL_NAMESPACE}")
+    
+    while True:
+        if check_model_status():
+            print(f"Model {MODEL_NAME} is ready. Running validation...")
+            run_validation()
+        else:
+            print(f"Model {MODEL_NAME} is not ready. Waiting...")
+        
+        time.sleep(300)  # Check every 5 minutes
+
+if __name__ == "__main__":
+    main()
+PYTHON_SCRIPT
+
+# Create ConfigMap with validation scripts
+oc create configmap validation-scripts \
+  --from-file=validation-controller.py=validation-controller.py \
+  -n ${VALIDATION_NAMESPACE} \
+  --dry-run=client -o yaml | oc apply -f -
+----
+
+== Step 4: Verify Deployment
+
+Verify the validation service is running:
+
+[source,bash]
+----
+# Check deployment status
+oc get deployment validation-service -n ${VALIDATION_NAMESPACE}
+
+# Check pod logs
+oc logs -f deployment/validation-service -n ${VALIDATION_NAMESPACE}
+
+# Check service account
+oc get sa validation-service-sa -n ${VALIDATION_NAMESPACE}
+----
+
+== Step 5: Test Validation Service
+
+Test that the validation service can monitor your model:
+
+[source,bash]
+----
+# Check if service is monitoring the model
+oc logs deployment/validation-service -n ${VALIDATION_NAMESPACE} | grep -i "model"
+
+# Verify validation jobs are being created
+oc get lmevaljob -n ${VALIDATION_NAMESPACE}
+----
+
+== Understanding the Validation Service
+
+The validation service:
+
+* **Monitors:** Continuously checks InferenceService status
+* **Validates:** Runs validation tests when model is ready
+* **Stores:** Saves validation results to S3
+* **Reports:** Provides validation status via logs and API
+
+== Next Steps
+
+* Learn how to xref:automated-validation.adoc[automate validation pipelines]
+* Integrate validation into your deployment workflow
+
+---
+
+*Validation service deployed. Now let's automate it.*

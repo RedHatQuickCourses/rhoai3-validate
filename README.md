@@ -1,60 +1,183 @@
-## Getting started with a new training content repository
+# Model Validation for Business Applications
 
-- Open the [course-starter-template](https://github.com/RedHatQuickCourses/course-starter-template)
+**Validating AI Models for Specific Business Use Cases in Red Hat OpenShift AI**
 
-- Click on `Use This template` button and select `Create a new repository` option.
+> **The Challenge:** Deploying a model is not enough. You need to know if it works for YOUR business application.  
+> **The Solution:** A structured approach to validating models across accuracy, performance, and domain knowledge, ending with automated validation services in OpenShift AI.
 
-![use-this-template.png](./images/use-this-template.png)
+This repository contains a complete course on **Model Validation for Business Applications**. It guides Platform Engineers and MLOps Engineers from understanding business value to deploying automated validation services that ensure ongoing model quality.
 
-- On `Create a new repository` page, Select the options as highlighted in the below image and then click `Create repository` button at the bottom of the page.
+---
 
-![create-new-repo.png](./images/create-new-repo.png)
+## 🎯 Course Overview
 
-- Clone this repository on your local system:
+This course teaches you to:
+
+* **Understand Business Value:** Translate business requirements into validation criteria
+* **Run Application-Specific Validation:** Test models across accuracy, performance, and domain knowledge
+* **Deploy Validation Services:** Automate validation in OpenShift AI for continuous quality monitoring
+
+---
+
+## 📚 Course Structure
+
+### Chapter 1: Understanding Business Value
+
+Learn why validation matters for business applications and how to define validation criteria based on business requirements.
+
+**Topics:**
+* Why validation matters for business
+* Defining business requirements
+* Creating validation criteria
+* Measuring validation ROI
+
+### Chapter 2: Application-Specific Validation
+
+Hands-on labs for validating models across multiple dimensions relevant to business applications.
+
+**Labs:**
+* **Multi-Language Validation:** Ensure models work across global markets
+* **Performance Validation:** Verify models meet production performance requirements
+* **Domain-Specific Validation:** Test models on business-relevant scenarios
+* **Results Analysis:** Analyze validation results in business context
+
+### Chapter 3: Deploying Validation Services
+
+Deploy automated validation services in OpenShift AI that continuously monitor model quality.
+
+**Topics:**
+* Validation service design
+* Deploying validation services
+* Automated validation pipelines
+
+---
+
+## ⚡ Quick Start
+
+### Prerequisites
+
+* **Cluster:** Red Hat OpenShift AI 3.0+ installed
+* **Model Deployed:** Complete the **rhoai3-deploy** course first
+* **CLI:** `oc` logged in with appropriate privileges
+* **Operators:** TrustyAI operator installed and configured
+
+### Building the Course
+
+Using Docker (Recommended):
+
+```bash
+docker run -u $(id -u) -v $PWD:/antora:Z --rm -t antora/antora antora-playbook.yml
+# Open the generated site:
+# open build/site/index.html
 ```
-git clone git@github.com:RedHatQuickCourses/my-training-repository.git
-```
-NOTE: Use your repository url in the above command.
 
-- Go in to the course repository directory and initialize the course.
-``` 
-cd my-training-repository/
-sh course-init.sh --type bfx --lab demo
-```
-NOTE: If you are using Mac, use *zsh* in place of *sh* in the above command.
+Using Local NPM:
 
-Sample output:
-```
-Initializing my-training-repository . . . done
-
-Please replace the specified strings in the files below and commit the changes before proceeding with the course development.
-antora.yml:title: REPLACE Course Title
+```bash
+npm install
+npx antora antora-playbook.yml
 ```
 
-- Edit the files prompted by course initialization script.
+---
 
-- Commit the changes done by course initialization script and your manual edits.
+## 🎓 Learning Objectives
+
+By the end of this course, you will be able to:
+
+* Define validation criteria based on business requirements
+* Run comprehensive validation tests across accuracy, performance, and domain knowledge
+* Deploy automated validation services in OpenShift AI
+* Create validation reports suitable for stakeholder review
+* Integrate validation into your model deployment workflow
+
+---
+
+## 📂 Repository Structure
+
 ```
- git status 
- git add -A; git commit -m "course initialization"
- git push origin main 
+/
+├── modules/
+│   ├── ROOT/                    # Course introduction
+│   ├── chapter1/                # Understanding Business Value
+│   ├── chapter2/                # Application-Specific Validation
+│   └── chapter3/                # Deploying Validation Services
+├── deploy/                      # (Future) Validation service deployment scripts
+├── antora.yml                   # Antora configuration
+└── README.md                    # This file
 ```
 
-- Browse your git repository url 
+---
 
-- On your github repo page, on left hand side pane, click on settings gear icon near `About` heading.
+## 🔗 Related Courses
 
-- Click `Use your GitHub Pages website` option to select (checked) it and then click `Save changes` button.
+This course is part of a series:
 
-![github-pages-setting](./images/github-pages-setting.png)
+* **rhoai3-deploy:** Deploy models in OpenShift AI
+* **rhoai3-registry:** Register models in Model Registry
+* **rhoai3-validate:** This course - Validate models for business applications
 
-- You should now see the link to access the rendered content within that same block.
+---
 
-![quickcourse-rendered-url](./images/quickcourse-rendered-url.png)
+## 🛠️ Troubleshooting
 
-FIXME: highlight the relevant area on images.
+### Validation Jobs Fail
 
-**SEE ALSO**
+**Cause:** TrustyAI operator not configured or model endpoint not accessible.
 
-- [Development using devspace](./DEVSPACE.md)
-- [Guideline for editing your content](./USAGEGUIDE.adoc)
+**Fix:** 
+* Verify TrustyAI operator is installed and configured
+* Check model InferenceService is in "Ready" state
+* Verify network connectivity to model endpoint
+
+### Performance Benchmarks Timeout
+
+**Cause:** Model too slow or resource constraints.
+
+**Fix:**
+* Increase timeout values
+* Check GPU resources are available
+* Verify model configuration is optimized
+
+### Domain Validation Low Accuracy
+
+**Cause:** Model doesn't understand your domain.
+
+**Fix:**
+* Consider fine-tuning on domain-specific data
+* Use prompt engineering
+* Evaluate alternative models better suited to your domain
+
+---
+
+## 📝 Course Duration
+
+* **Estimated Time:** 4-6 hours
+* **Format:** Hands-on labs with command-line workflows
+* **Deliverable:** Deployed validation service monitoring your model
+
+---
+
+## 🤝 Contributing
+
+This course is part of the Red Hat Quick Courses initiative. For contributions, please follow the course development guidelines.
+
+---
+
+## 📄 License
+
+This course content is provided under the course license terms.
+
+---
+
+## 🔗 Next Steps
+
+Once you have completed this course, you are ready to:
+
+* Integrate validation into your CI/CD pipelines
+* Deploy validation services for all your models
+* Use validation results to inform model selection and deployment decisions
+* Build validation dashboards for stakeholder visibility
+
+---
+
+*Validate with confidence. Deploy with assurance.*

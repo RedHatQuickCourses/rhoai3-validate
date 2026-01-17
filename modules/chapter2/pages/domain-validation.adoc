@@ -1,0 +1,188 @@
+= Lab: Domain-Specific Validation
+:navtitle: Domain-Specific Validation
+:toc: macro
+
+// Antora metadata
+:page-role: MLOps Engineer
+:description: Create and run custom validation tasks tailored to your business domain.
+
+[.lead]
+*Standard benchmarks test general intelligence. Domain validation tests business value.*
+
+While standardized benchmarks measure general model capabilities, they don't tell you if your model understands *your* business domain. This lab teaches you to create and run domain-specific validations that measure model performance on tasks relevant to your use case.
+
+== Why Domain-Specific Validation Matters
+
+Domain-specific validation answers critical business questions:
+
+* **Does the model understand our terminology?** (e.g., medical jargon, legal terms, financial concepts)
+* **Can it handle our specific use cases?** (e.g., insurance claim processing, code review, customer support)
+* **Is it safe for our domain?** (e.g., healthcare compliance, financial regulations)
+* **Does fine-tuning improve domain performance?** (measuring ROI of customization efforts)
+
+== Prerequisites
+
+Before starting, ensure:
+
+* Your InferenceService is deployed and in "Ready" state
+* TrustyAI operator is installed and configured
+* You have domain-specific questions/prompts ready
+* You understand your model's expected behavior in your domain
+
+== Step 1: Prepare Domain-Specific Dataset
+
+Create a custom validation dataset with domain-specific questions:
+
+[source,bash]
+----
+# Create validation directory
+mkdir -p ~/domain-validation
+cd ~/domain-validation
+
+# Create a custom validation dataset
+# Format: JSONL (one JSON object per line)
+cat > domain-dataset.jsonl <<EOF
+{"input": "What is the recommended treatment for Type 2 diabetes?", "expected_output": "Metformin is typically the first-line treatment", "domain": "healthcare"}
+{"input": "Explain the difference between a deductible and a copay.", "expected_output": "A deductible is the amount you pay before insurance kicks in, while a copay is a fixed amount per service", "domain": "insurance"}
+{"input": "What are the key requirements for GDPR compliance?", "expected_output": "GDPR requires data protection, user consent, right to deletion, and breach notification", "domain": "legal"}
+{"input": "Calculate the compound interest for $10,000 at 5% APR over 10 years.", "expected_output": "Approximately $16,288.95", "domain": "finance"}
+EOF
+
+echo "✅ Created domain dataset with $(wc -l < domain-dataset.jsonl) examples"
+----
+
+[NOTE]
+.Dataset Format
+====
+The dataset uses JSONL format (one JSON object per line). Each object should have:
+* `input`: The question or prompt
+* `expected_output`: The expected answer (for reference)
+* `domain`: Your business domain (optional, for categorization)
+
+You can add more fields as needed for your validation.
+====
+
+== Step 2: Create Custom Evaluation Task
+
+Create a TrustyAI-compatible task definition:
+
+[source,bash]
+----
+# Create task definition
+cat > domain-task.yaml <<EOF
+task: domain_evaluation
+group: custom
+description: "Domain-specific evaluation for business use cases"
+metrics:
+  - accuracy
+  - exact_match
+output_type: generate_until
+EOF
+
+echo "✅ Created task definition"
+----
+
+== Step 3: Run Domain Validation
+
+Create and run an LMEvalJob with your custom dataset:
+
+[source,bash]
+----
+# Set your model information
+export NAMESPACE="model-deploy-lab"
+export MODEL_NAME="granite-4-micro"
+export INFERENCE_URL=$(oc get inferenceservice $MODEL_NAME -n ${NAMESPACE} \
+  -o jsonpath='{.status.url}')
+
+# Create custom evaluation job
+cat > domain-eval-job.yaml <<EOF
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: domain-specific-eval
+  namespace: ${NAMESPACE}
+spec:
+  model: local-completions
+  taskList:
+    taskNames:
+      - domain_evaluation
+  modelArgs:
+    - name: model
+      value: ${MODEL_NAME}
+    - name: base_url
+      value: ${INFERENCE_URL}/v1/completions
+    - name: num_concurrent
+      value: '1'
+    - name: max_retries
+      value: '6'
+    - name: tokenized_requests
+      value: 'False'
+    - name: tokenizer
+      value: ibm-granite/granite-4-micro
+  logSamples: true
+  batchSize: '1'
+  allowOnline: true
+  allowCodeExecution: false
+  outputs:
+    pvcManaged:
+      size: 5Gi
+EOF
+
+# Create ConfigMap with custom dataset
+oc create configmap domain-dataset-cm \
+  --from-file=domain-dataset.jsonl=~/domain-validation/domain-dataset.jsonl \
+  --from-file=domain-task.yaml=~/domain-validation/domain-task.yaml \
+  -n ${NAMESPACE}
+
+# Apply the evaluation job
+oc apply -f domain-eval-job.yaml
+----
+
+== Step 4: Monitor and Extract Results
+
+Monitor the validation job and extract results:
+
+[source,bash]
+----
+# Watch job status
+oc get lmevaljob domain-specific-eval -n ${NAMESPACE} -w
+
+# Extract results (similar to multi-language validation)
+# Get the PVC name and copy results
+PVC_NAME=$(oc get lmevaljob domain-specific-eval -n ${NAMESPACE} \
+  -o jsonpath='{.status.outputs.pvcManaged.name}')
+
+# Create extraction pod and copy results
+# (Refer to multi-language validation lab for full extraction script)
+----
+
+== Understanding Domain-Specific Results
+
+Domain validation results typically include:
+
+* **Accuracy:** Percentage of correct answers
+* **Exact Match:** Percentage of responses that exactly match expected output
+* **Domain-Specific Metrics:** Custom metrics relevant to your use case
+* **Sample Responses:** Actual model outputs for manual review
+
+=== Interpreting Results
+
+* **High Accuracy (>80%):** Model understands your domain well
+* **Medium Accuracy (60-80%):** Model has gaps but may be usable with prompt engineering
+* **Low Accuracy (<60%):** Model may need fine-tuning or domain-specific training
+
+**Business Decision Points:**
+* If accuracy is below your threshold, consider:
+  * Fine-tuning on domain-specific data
+  * Using prompt engineering
+  * Selecting a different model better suited to your domain
+
+== Next Steps
+
+* Proceed to xref:results-analysis.adoc[Results Analysis] to analyze all your validation results together
+* Compare domain-specific results with general benchmarks to identify gaps
+* Use results to inform fine-tuning or prompt engineering efforts
+
+---
+
+*Domain knowledge tested. Now let's analyze all the results.*

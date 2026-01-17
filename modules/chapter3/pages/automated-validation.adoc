@@ -1,0 +1,91 @@
+= Automated Validation Pipeline
+:navtitle: Automated Validation Pipeline
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer
+:description: Integrate validation into your deployment workflow with automated pipelines.
+
+[.lead]
+*Automation makes validation consistent, efficient, and reliable.*
+
+This module teaches you to integrate validation into your deployment workflow so validation runs automatically on every model update.
+
+== Integration Patterns
+
+=== GitOps Integration
+
+Trigger validation on Git commits:
+
+* **Use Case:** Validate models before merging to main
+* **Trigger:** Git webhook or CI/CD pipeline
+* **Workflow:** Commit → Build → Deploy → Validate
+
+=== Deployment Integration
+
+Trigger validation on model deployment:
+
+* **Use Case:** Validate every model update
+* **Trigger:** InferenceService creation/update
+* **Workflow:** Deploy → Validate → Report
+
+=== Scheduled Integration
+
+Run validation on a schedule:
+
+* **Use Case:** Regular quality checks
+* **Trigger:** CronJob or scheduled pipeline
+* **Workflow:** Schedule → Validate → Report
+
+== Creating Validation Pipeline
+
+Create a Tekton pipeline that automates validation:
+
+[source,bash]
+----
+# Create validation pipeline
+cat > validation-pipeline.yaml <<EOF
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: model-validation-pipeline
+  namespace: model-validation-lab
+spec:
+  params:
+  - name: model-name
+    description: Name of the model to validate
+  - name: model-namespace
+    description: Namespace of the model
+  tasks:
+  - name: validate-accuracy
+    taskRef:
+      name: trustyai-eval-task
+    params:
+    - name: model-name
+      value: $(params.model-name)
+  - name: validate-performance
+    taskRef:
+      name: guidellm-benchmark-task
+    params:
+    - name: model-name
+      value: $(params.model-name)
+  - name: report-results
+    taskRef:
+      name: validation-report-task
+    runAfter:
+    - validate-accuracy
+    - validate-performance
+EOF
+
+oc apply -f validation-pipeline.yaml
+----
+
+== Next Steps
+
+* Integrate validation into your deployment workflow
+* Monitor validation results in OpenShift AI Dashboard
+* Use validation results to inform deployment decisions
+
+---
+
+*Validation automated. Your models are now continuously validated.*

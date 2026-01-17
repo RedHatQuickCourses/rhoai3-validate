@@ -1,0 +1,125 @@
+= Lab: Performance Validation
+:navtitle: Performance Validation
+:toc: macro
+
+// Antora metadata
+:page-role: MLOps Engineer
+:description: Measure model performance (latency, throughput) to ensure it meets business requirements.
+
+[.lead]
+*Performance is where cost meets user experience. A model that is accurate but too slow will fail in production.*
+
+This lab teaches you to measure your model's system performance using **GuideLLM** to ensure it meets your business performance requirements.
+
+== Why Performance Validation Matters
+
+System performance directly impacts:
+
+* **User Experience:** Latency determines response time. Users expect sub-second responses in interactive applications.
+* **Cost Efficiency:** Throughput determines how many requests you can serve per GPU. Higher throughput = lower cost per request.
+* **Scalability:** Resource utilization determines how many concurrent users you can support.
+* **Deployment Readiness:** Performance metrics inform architectural decisions (batching, caching, distributed serving).
+
+This lab uses **GuideLLM** to measure:
+
+* **Latency:** Time to first token (TTFT) and inter-token latency
+* **Throughput:** Requests per second (RPS) and tokens per second (TPS)
+* **Resource Utilization:** GPU and memory usage under load
+
+== Prerequisites
+
+Before starting, ensure:
+
+* Your InferenceService is deployed and in "Ready" state
+* You know your model's inference endpoint URL
+* Tekton is installed in your cluster
+* You have access to create Tekton TaskRuns
+* S3 storage is available for results
+
+== Step 1: Identify Your Model Endpoint
+
+Get your model's inference endpoint:
+
+[source,bash]
+----
+# Set your namespace
+export NAMESPACE="model-deploy-lab"
+export MODEL_NAME="granite-4-micro"
+
+# Get the inference endpoint
+export INFERENCE_URL=$(oc get inferenceservice $MODEL_NAME -n ${NAMESPACE} \
+  -o jsonpath='{.status.url}')
+echo "Inference URL: $INFERENCE_URL"
+
+# For GuideLLM, we need the /v1 endpoint
+export TARGET_ENDPOINT="${INFERENCE_URL}/v1"
+echo "Target endpoint: $TARGET_ENDPOINT"
+----
+
+== Step 2: Run Performance Benchmark
+
+Run the GuideLLM benchmark with a sweep test that automatically tests multiple request rates:
+
+[source,bash]
+----
+# Set benchmark parameters
+export PROCESSOR="ibm-granite/granite-4-micro"
+export DATA_CONFIG="prompt_tokens=512,output_tokens=128"
+export MAX_SECONDS="60"
+export RATE_TYPE="sweep"
+export RATE="1.0,2.0,4.0,8.0"
+export MAX_CONCURRENCY="10"
+
+# Create TaskRun (simplified - adjust based on your GuideLLM setup)
+# Refer to genai-amep chapter 2 for full GuideLLM TaskRun configuration
+----
+
+[NOTE]
+.Full GuideLLM Configuration
+====
+For complete GuideLLM benchmark configuration, refer to the performance evaluation lab in the genai-amep course. This lab focuses on the business value and interpretation of results.
+====
+
+== Understanding Performance Results
+
+The GuideLLM results include:
+
+=== Latency Metrics
+
+* **Time to First Token (TTFT):** How long until the first token is generated
+* **Inter-Token Latency:** Average time between tokens
+* **End-to-End Latency:** Total time for a complete request
+* **Percentiles:** p50, p95, p99 latency values
+
+=== Throughput Metrics
+
+* **Requests Per Second (RPS):** How many requests the system can handle
+* **Tokens Per Second (TPS):** Token generation rate
+* **Successful Requests:** Percentage of requests that completed successfully
+
+=== Interpreting Results in Business Context
+
+Typical performance targets:
+* **TTFT:** < 200ms for interactive applications
+* **Inter-Token Latency:** < 50ms for smooth streaming
+* **RPS:** Varies by model size, but 10+ RPS is good for most use cases
+* **Success Rate:** > 99% for production readiness
+
+**Business Decision Points:**
+* If latency exceeds your application requirements, consider:
+  * Optimizing model configuration
+  * Using a smaller/faster model
+  * Implementing caching strategies
+* If throughput is insufficient, consider:
+  * Scaling horizontally (multiple replicas)
+  * Optimizing batch processing
+  * Using more powerful hardware
+
+== Next Steps
+
+* Proceed to xref:domain-validation.adoc[Domain-Specific Validation] to test business-relevant scenarios
+* Or continue to xref:results-analysis.adoc[Results Analysis] to analyze all your validation results together
+
+---
+
+*Performance measured. Now let's test domain knowledge.*

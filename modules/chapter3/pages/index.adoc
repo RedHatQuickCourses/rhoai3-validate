@@ -1,7 +1,64 @@
-= Chapter 3
+= Deploying Validation Services in OpenShift AI
+:navtitle: Deploying Validation Services
+:toc: macro
 
-In this section, we cover... FIXME
+// Antora metadata
+:page-role: Platform Engineer
+:description: Deploy automated validation services that continuously monitor model quality in OpenShift AI.
 
+[.lead]
+*Automated validation services ensure ongoing model quality and catch issues before they impact customers.*
 
-- Add or remove section entries in the `antora.yaml` file as needed.
-- Ensure you create or delete the corresponding directory for the chapter accordingly.
+You've validated your model manually. Now it's time to deploy automated validation services that continuously monitor model quality and provide early warning of issues.
+
+== Why Deploy Validation Services
+
+Manual validation is valuable, but automated validation services provide:
+
+* **Continuous Monitoring:** Validate models on every update
+* **Early Warning:** Catch issues before they impact customers
+* **Consistency:** Standardized validation across all models
+* **Efficiency:** Automated validation reduces manual effort
+
+== What You'll Deploy
+
+This chapter teaches you to deploy:
+
+* **Validation Service:** A Kubernetes service that runs validation tests
+* **Validation Pipeline:** Automated validation triggered by model updates
+* **Validation Dashboard:** Visualization of validation results
+
+== Prerequisites
+
+Before starting, ensure:
+
+* You have completed Chapter 2 (validation tests run successfully)
+* Your OpenShift AI cluster is accessible
+* You have permissions to create Kubernetes resources
+* S3 storage is available for validation results
+
+== Chapter Structure
+
+This chapter is organized into three modules:
+
+1. **Validation Service Design:** Understand the architecture
+2. **Deploy Validation Service:** Deploy the service in OpenShift AI
+3. **Automated Validation Pipeline:** Integrate validation into your workflow
+
+== Expected Outcomes
+
+By the end of this chapter, you will have:
+
+* Deployed a validation service in OpenShift AI
+* Automated validation triggered by model updates
+* A validation dashboard showing ongoing model quality
+* Integration of validation into your deployment workflow
+
+== Next Steps
+
+* Learn about xref:validation-service-design.adoc[validation service design]
+* Proceed to xref:deploy-validation-service.adoc[deploy the validation service]
+
+---
+
+*Ready to deploy? Let's start with service design.*

@@ -1,0 +1,67 @@
+= Validation Service Design
+:navtitle: Validation Service Design
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer
+:description: Understand the architecture and design of validation services.
+
+[.lead]
+*Good architecture enables automation. Understanding the design helps you deploy effectively.*
+
+Before deploying, understand the validation service architecture and how it integrates with your OpenShift AI environment.
+
+== Validation Service Architecture
+
+=== Components
+
+The validation service consists of:
+
+* **Validation Controller:** Orchestrates validation jobs
+* **Validation Jobs:** Run validation tests (TrustyAI LMEvalJob, GuideLLM)
+* **Results Storage:** S3-compatible storage for validation results
+* **Validation API:** REST API for triggering validations and retrieving results
+* **Dashboard:** Visualization of validation results
+
+=== Integration Points
+
+The validation service integrates with:
+
+* **InferenceService:** Monitors deployed models
+* **Model Registry:** Tracks model versions
+* **S3 Storage:** Stores validation results
+* **OpenShift AI Dashboard:** Displays validation status
+
+== Service Design Patterns
+
+=== Scheduled Validation
+
+Run validation on a schedule (e.g., daily, weekly):
+
+* **Use Case:** Regular quality checks
+* **Trigger:** CronJob or scheduled pipeline
+* **Frequency:** Based on business requirements
+
+=== Event-Driven Validation
+
+Run validation triggered by events (e.g., model updates):
+
+* **Use Case:** Validate on every model deployment
+* **Trigger:** Webhook or pipeline event
+* **Frequency:** On-demand
+
+=== Continuous Validation
+
+Run validation continuously:
+
+* **Use Case:** Real-time quality monitoring
+* **Trigger:** Continuous monitoring loop
+* **Frequency:** Continuous
+
+== Next Steps
+
+* Proceed to xref:deploy-validation-service.adoc[deploy the validation service]
+
+---
+
+*Now let's deploy the validation service.*

@@ -1,7 +1,114 @@
-= Chapter 2
+= Application-Specific Validation
+:navtitle: Application-Specific Validation
+:toc: macro
 
-In this section, we cover... FIXME
+// Antora metadata
+:page-role: MLOps Engineer
+:description: Hands-on labs for validating models across accuracy, performance, and domain knowledge for business applications.
 
+[.lead]
+*Application-specific validation tests whether your model works for YOUR business use case.*
 
-- Add or remove section entries in the `antora.yaml` file as needed.
-- Ensure you create or delete the corresponding directory for the chapter accordingly.
+You've defined your business requirements and validation criteria. Now it's time to run comprehensive validation tests that measure how well your model performs for your specific application.
+
+== The Three Dimensions of Validation
+
+This chapter covers three critical dimensions of application-specific validation:
+
+=== 1. Multi-Language Validation
+
+**Business Question:** "Does the model work across all our markets?"
+
+For global applications, validate model accuracy across multiple languages:
+* English (en)
+* Spanish (es)
+* Japanese (ja)
+
+**What you'll learn:**
+* How to run multi-language accuracy tests using TrustyAI LMEvalJob
+* How to interpret accuracy metrics across languages
+* How to identify language-specific performance gaps
+
+=== 2. Performance Validation
+
+**Business Question:** "Can the model serve requests fast enough for our application?"
+
+Measure system performance to ensure the model meets production requirements:
+* Latency (time to first token, inter-token latency)
+* Throughput (requests per second, tokens per second)
+* Resource utilization (GPU and memory usage)
+
+**What you'll learn:**
+* How to run performance benchmarks using GuideLLM
+* How to interpret latency and throughput metrics
+* How to identify performance bottlenecks
+
+=== 3. Domain-Specific Validation
+
+**Business Question:** "Does the model understand our business domain?"
+
+Test model performance on business-relevant scenarios:
+* Domain terminology understanding
+* Use case workflow handling
+* Compliance and safety requirements
+
+**What you'll learn:**
+* How to create custom validation datasets for your application
+* How to run domain-specific evaluation jobs
+* How to measure model performance on business-relevant tasks
+
+== Prerequisites
+
+Before starting this chapter, ensure:
+
+* You have completed Chapter 1 (business requirements defined)
+* Your InferenceService is deployed and in "Ready" state
+* TrustyAI operator is installed and configured
+* You have access to create LMEvalJob resources
+* S3 storage is available for results
+
+[IMPORTANT]
+.Verify Your Model is Ready
+====
+Before proceeding, verify your InferenceService is running:
+
+[source,bash]
+----
+# Check your InferenceService status
+oc get inferenceservice -n <your-namespace>
+
+# Verify the service is ready
+oc get inferenceservice <your-model-name> -n <your-namespace> \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+----
+
+The output should be `True`. If not, troubleshoot your deployment before continuing.
+====
+
+== Lab Structure
+
+This chapter is organized into four sequential labs:
+
+1. **Multi-Language Validation:** Test accuracy across languages
+2. **Performance Validation:** Measure system performance
+3. **Domain-Specific Validation:** Test business-relevant scenarios
+4. **Results Analysis:** Analyze and interpret validation results
+
+== Expected Outcomes
+
+By the end of this chapter, you will have:
+
+* Run comprehensive validation tests across accuracy, performance, and domain knowledge
+* Stored all validation results in S3 for future reference
+* Analyzed validation results in business context
+* Created validation reports suitable for stakeholder review
+
+== Next Steps
+
+* Start with xref:multilang-validation.adoc[Multi-Language Validation] to test accuracy across languages
+* Or proceed to xref:performance-validation.adoc[Performance Validation] to measure system performance
+* Or jump to xref:domain-validation.adoc[Domain-Specific Validation] for business-focused testing
+
+---
+
+*Ready to validate? Let's start with multi-language accuracy testing.*

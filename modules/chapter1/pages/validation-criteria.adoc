@@ -1,0 +1,109 @@
+= Creating Validation Criteria
+:navtitle: Creating Validation Criteria
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer
+:description: Learn to create specific validation criteria from business requirements.
+
+[.lead]
+*Validation criteria turn business requirements into measurable tests.*
+
+Once you have business requirements, you need to translate them into specific, measurable validation criteria.
+
+== From Requirements to Criteria
+
+=== Accuracy Criteria
+
+Translate accuracy requirements into testable criteria:
+
+* **General Accuracy:** Standard benchmark scores (MMLU, ARC, HellaSwag)
+* **Domain Accuracy:** Custom dataset accuracy scores
+* **Use Case Accuracy:** Real-world scenario success rates
+
+=== Performance Criteria
+
+Translate performance requirements into measurable metrics:
+
+* **Latency:** Time to first token (TTFT) < threshold
+* **Throughput:** Requests per second (RPS) > threshold
+* **Resource Utilization:** GPU and memory usage within limits
+
+=== Quality Criteria
+
+Translate quality requirements into testable standards:
+
+* **Safety:** Zero harmful or inappropriate responses
+* **Compliance:** 100% adherence to regulatory requirements
+* **Consistency:** Response variance within acceptable range
+
+== Example: Customer Support Criteria
+
+Based on the customer support requirements:
+
+=== Accuracy Criteria
+
+* **General:** MMLU score > 0.60
+* **Domain:** Customer support dataset accuracy > 0.90
+* **Use Case:** Real customer query success rate > 0.85
+
+=== Performance Criteria
+
+* **Latency:** TTFT < 500ms for 95% of requests
+* **Throughput:** RPS > 10
+* **Resource:** GPU utilization < 80%
+
+=== Quality Criteria
+
+* **Safety:** Zero policy violations in 1000 test queries
+* **Compliance:** 100% adherence to data privacy requirements
+* **Consistency:** Response similarity > 0.85 for similar queries
+
+== Example: Document Analysis Criteria
+
+Based on the document analysis requirements:
+
+=== Accuracy Criteria
+
+* **General:** Information extraction accuracy > 0.95
+* **Domain:** Legal document accuracy > 0.90
+* **Use Case:** Real document processing success rate > 0.92
+
+=== Performance Criteria
+
+* **Latency:** Processing time < 36 seconds per document
+* **Throughput:** Process 100 documents per hour
+* **Resource:** Memory usage < 16GB per document
+
+=== Quality Criteria
+
+* **Safety:** Zero data leakage in test scenarios
+* **Compliance:** 100% adherence to legal confidentiality standards
+* **Consistency:** Extraction consistency > 0.90 across similar documents
+
+== Validation Test Design
+
+=== Test Dataset Creation
+
+Create test datasets that reflect your criteria:
+
+* **General Tests:** Standard benchmark datasets
+* **Domain Tests:** Custom datasets with domain-specific scenarios
+* **Use Case Tests:** Real-world scenarios from your application
+
+=== Test Execution
+
+Design test execution that measures your criteria:
+
+* **Accuracy Tests:** Run evaluation jobs and measure accuracy scores
+* **Performance Tests:** Run performance benchmarks and measure metrics
+* **Quality Tests:** Run safety and compliance checks
+
+== Next Steps
+
+* Learn how to xref:roi-measurement.adoc[measure ROI] of validation efforts
+* Proceed to xref:chapter2:index.adoc[Chapter 2] to run application-specific validation tests
+
+---
+
+*Now let's measure the ROI of validation efforts.*

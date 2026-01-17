@@ -1,0 +1,51 @@
+= Results Analysis & Business Insights
+:navtitle: Results Analysis
+:toc: macro
+
+// Antora metadata
+:page-role: MLOps Engineer
+:description: Analyze validation results and extract business insights.
+
+[.lead]
+*Validation results are data. Analysis turns data into business decisions.*
+
+This module teaches you to analyze validation results across all dimensions (accuracy, performance, domain) and extract actionable business insights.
+
+== Analyzing Multi-Dimensional Results
+
+Combine results from all validation dimensions:
+
+=== Accuracy Analysis
+
+* Compare accuracy across languages
+* Identify language-specific gaps
+* Assess overall model quality
+
+=== Performance Analysis
+
+* Evaluate latency against business requirements
+* Assess throughput for scalability
+* Identify performance bottlenecks
+
+=== Domain Analysis
+
+* Measure domain-specific understanding
+* Identify areas needing improvement
+* Assess business readiness
+
+== Creating Business Reports
+
+Generate stakeholder-ready reports that answer:
+
+* **Is the model ready for production?** (Overall assessment)
+* **What are the risks?** (Identified gaps and limitations)
+* **What are the recommendations?** (Next steps and improvements)
+
+== Next Steps
+
+* Proceed to xref:chapter3:index.adoc[Chapter 3] to deploy automated validation services
+* Learn how to integrate validation into your deployment workflow
+
+---
+
+*Results analyzed. Now let's deploy automated validation services.*

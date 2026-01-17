@@ -1,0 +1,115 @@
+= Defining Business Requirements for Validation
+:navtitle: Defining Business Requirements
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer
+:description: Learn to translate business requirements into validation criteria.
+
+[.lead]
+*Business requirements drive validation—not the other way around.*
+
+Before you can validate a model, you must understand what "good" means for your business application.
+
+== Identifying Business Requirements
+
+=== Step 1: Define Your Use Case
+
+Start by clearly defining your application:
+
+* **What problem are you solving?** (e.g., customer support, document analysis, code generation)
+* **Who are your users?** (e.g., internal employees, external customers, developers)
+* **What is the expected workflow?** (e.g., real-time chat, batch processing, API integration)
+
+=== Step 2: Identify Success Criteria
+
+Define what success looks like for your application:
+
+* **Accuracy Requirements:** What level of correctness is acceptable?
+* **Performance Requirements:** What latency and throughput are needed?
+* **Quality Requirements:** What safety and compliance standards must be met?
+* **Cost Requirements:** What is the acceptable cost per request?
+
+=== Step 3: Identify Failure Modes
+
+Understand what can go wrong:
+
+* **Accuracy Failures:** Incorrect or misleading responses
+* **Performance Failures:** Responses too slow for the use case
+* **Quality Failures:** Responses that violate safety or compliance standards
+* **Cost Failures:** Deployment costs exceed business value
+
+== Example: Customer Support Application
+
+=== Use Case Definition
+
+* **Problem:** Automate customer support responses
+* **Users:** External customers seeking help
+* **Workflow:** Real-time chat interface
+
+=== Success Criteria
+
+* **Accuracy:** >90% of responses are helpful and correct
+* **Performance:** <2 second response time for 95% of requests
+* **Quality:** No responses that violate company policy
+* **Cost:** <$0.01 per request
+
+=== Failure Modes
+
+* **Accuracy:** Providing incorrect information to customers
+* **Performance:** Slow responses frustrate customers
+* **Quality:** Responses that damage brand reputation
+* **Cost:** Deployment costs exceed savings from automation
+
+== Example: Document Analysis Application
+
+=== Use Case Definition
+
+* **Problem:** Extract and analyze information from legal documents
+* **Users:** Legal professionals
+* **Workflow:** Batch processing of document sets
+
+=== Success Criteria
+
+* **Accuracy:** >95% accuracy on key information extraction
+* **Performance:** Process 100 documents per hour
+* **Quality:** Maintain confidentiality and compliance with legal standards
+* **Cost:** Reduce manual review time by 70%
+
+=== Failure Modes
+
+* **Accuracy:** Missing critical information in documents
+* **Performance:** Processing too slow for business needs
+* **Quality:** Violating confidentiality or compliance requirements
+* **Cost:** Automation costs exceed manual processing costs
+
+== Translating Requirements to Validation Criteria
+
+Once you have business requirements, translate them into validation criteria:
+
+=== Accuracy Criteria
+
+* **General Accuracy:** Test on standard benchmarks
+* **Domain Accuracy:** Test on domain-specific datasets
+* **Use Case Accuracy:** Test on real-world scenarios
+
+=== Performance Criteria
+
+* **Latency:** Measure time to first token and inter-token latency
+* **Throughput:** Measure requests per second and tokens per second
+* **Resource Utilization:** Measure GPU and memory usage
+
+=== Quality Criteria
+
+* **Safety:** Test for harmful or inappropriate responses
+* **Compliance:** Test for regulatory requirement adherence
+* **Consistency:** Test for response consistency across similar inputs
+
+== Next Steps
+
+* Learn how to xref:validation-criteria.adoc[create validation criteria] from these requirements
+* Understand how to xref:roi-measurement.adoc[measure ROI] of validation efforts
+
+---
+
+*Now let's create validation criteria from these requirements.*
