@@ -1,6 +1,6 @@
 site:
-  title: FIXME Course Title
-  start_page: REPLACEREPONAME::index.adoc
+  title: Model Validation for Business Applications
+  start_page: rhoai3-validate::index.adoc
 
 content:
   sources:
