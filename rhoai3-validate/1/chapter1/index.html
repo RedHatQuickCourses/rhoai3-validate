@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Understanding Business Value of Model Validation :: FIXME Course Title</title>
+    <link rel="prev" href="../index.html">
+    <link rel="next" href="../chapter2/index.html">
+    <meta name="generator" content="Antora 3.1.3">
+    <link rel="stylesheet" href="../../../_/css/site.css">
+    <script>var uiRootPath = '../../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="rhoai3-validate" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="../index.html">Model Validation for Business Applications</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../index.html">Introduction &amp; Business Value</a>
+  </li>
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Chapter 1: Understanding Business Value</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/index.html">Chapter 2: Application-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/index.html">Chapter 3: Deploying Validation Services</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Understanding Business Value</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="business-requirements.html">Defining Business Requirements</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="validation-criteria.html">Creating Validation Criteria</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="roi-measurement.html">Measuring Validation ROI</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/index.html">Application-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/multilang-validation.html">Multi-Language Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/performance-validation.html">Performance Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/domain-validation.html">Domain-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter2/results-analysis.html">Results Analysis &amp; Business Insights</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/index.html">Deploying Validation Services</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/validation-service-design.html">Validation Service Design</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/deploy-validation-service.html">Deploy Validation Service</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="../chapter3/automated-validation.html">Automated Validation Pipeline</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Model Validation for Business Applications</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="../index.html">Model Validation for Business Applications</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="../index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="../index.html">Model Validation for Business Applications</a></li>
+    <li><a href="index.html">Chapter 1: Understanding Business Value</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Understanding Business Value of Model Validation</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph lead">
+<p><strong>Validation is not a technical exercise—it&#8217;s a business imperative.</strong></p>
+</div>
+<div class="paragraph">
+<p>Before diving into validation techniques, we must understand why validation matters for business applications and how to align validation efforts with business goals.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_why_validation_matters_for_business"><a class="anchor" href="#_why_validation_matters_for_business"></a>Why Validation Matters for Business</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Model validation answers critical business questions:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Will this model work for our customers?</strong> (Application fit)</p>
+</li>
+<li>
+<p><strong>Can we trust this model in production?</strong> (Risk management)</p>
+</li>
+<li>
+<p><strong>Does this model meet our quality standards?</strong> (Compliance)</p>
+</li>
+<li>
+<p><strong>Is this model worth the deployment cost?</strong> (ROI)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_the_cost_of_skipping_validation"><a class="anchor" href="#_the_cost_of_skipping_validation"></a>The Cost of Skipping Validation</h3>
+<div class="paragraph">
+<p>Organizations that skip proper validation face:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Production Failures:</strong> Models that work in testing but fail with real users</p>
+</li>
+<li>
+<p><strong>Customer Impact:</strong> Poor quality responses damage brand reputation</p>
+</li>
+<li>
+<p><strong>Wasted Investment:</strong> Deploying models that don&#8217;t deliver business value</p>
+</li>
+<li>
+<p><strong>Compliance Risk:</strong> Models that violate regulatory requirements</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_value_of_proper_validation"><a class="anchor" href="#_the_value_of_proper_validation"></a>The Value of Proper Validation</h3>
+<div class="paragraph">
+<p>Organizations that validate properly achieve:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Confidence:</strong> Deploy models knowing they meet business requirements</p>
+</li>
+<li>
+<p><strong>Cost Savings:</strong> Avoid deploying unsuitable models</p>
+</li>
+<li>
+<p><strong>Risk Mitigation:</strong> Catch issues before they impact customers</p>
+</li>
+<li>
+<p><strong>Better Decisions:</strong> Data-driven model selection and deployment</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_business_requirements_vs_technical_metrics"><a class="anchor" href="#_business_requirements_vs_technical_metrics"></a>Business Requirements vs. Technical Metrics</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_general_benchmarks_dont_tell_the_full_story"><a class="anchor" href="#_general_benchmarks_dont_tell_the_full_story"></a>General Benchmarks Don&#8217;t Tell the Full Story</h3>
+<div class="paragraph">
+<p>Standard benchmarks (MMLU, ARC, HellaSwag) measure general model capabilities but don&#8217;t answer:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Does the model understand our industry terminology?</p>
+</li>
+<li>
+<p>Can it handle our specific use cases?</p>
+</li>
+<li>
+<p>Does it meet our performance requirements?</p>
+</li>
+<li>
+<p>Is it safe for our domain?</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_application_specific_validation"><a class="anchor" href="#_application_specific_validation"></a>Application-Specific Validation</h3>
+<div class="paragraph">
+<p>Application-specific validation tests:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Domain Knowledge:</strong> Understanding of your industry and terminology</p>
+</li>
+<li>
+<p><strong>Use Case Fit:</strong> Performance on your specific workflows</p>
+</li>
+<li>
+<p><strong>Performance Requirements:</strong> Latency and throughput for your application</p>
+</li>
+<li>
+<p><strong>Quality Standards:</strong> Accuracy and safety thresholds for your use case</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_validation_framework"><a class="anchor" href="#_the_validation_framework"></a>The Validation Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This course uses a three-dimensional validation framework:</p>
+</div>
+<div class="sect2">
+<h3 id="_1_accuracy_validation"><a class="anchor" href="#_1_accuracy_validation"></a>1. Accuracy Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Does the model produce correct answers?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Multi-language accuracy (for global applications)</p>
+</li>
+<li>
+<p>Domain-specific accuracy (for industry applications)</p>
+</li>
+<li>
+<p>Task-specific accuracy (for use case applications)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_2_performance_validation"><a class="anchor" href="#_2_performance_validation"></a>2. Performance Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Can the model serve requests fast enough?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Latency (user experience)</p>
+</li>
+<li>
+<p>Throughput (cost efficiency)</p>
+</li>
+<li>
+<p>Resource utilization (scalability)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_3_domain_validation"><a class="anchor" href="#_3_domain_validation"></a>3. Domain Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Does the model understand our business context?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Terminology understanding</p>
+</li>
+<li>
+<p>Workflow handling</p>
+</li>
+<li>
+<p>Compliance requirements</p>
+</li>
+<li>
+<p>Safety standards</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_next_steps"><a class="anchor" href="#_next_steps"></a>Next Steps</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Learn how to <a href="business-requirements.html" class="xref page">define business requirements</a> for validation</p>
+</li>
+<li>
+<p>Understand how to <a href="validation-criteria.html" class="xref page">create validation criteria</a> from requirements</p>
+</li>
+<li>
+<p>Discover how to <a href="roi-measurement.html" class="xref page">measure the ROI</a> of validation efforts</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p><strong>Now let&#8217;s translate business requirements into validation criteria.</strong></p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="../index.html">Introduction &amp; Business Value</a></span>
+  <span class="next"><a href="../chapter2/index.html">Chapter 2: Application-Specific Validation</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../../_/js/site.js" data-ui-root-path="../../../_"></script>
+<script async src="../../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>

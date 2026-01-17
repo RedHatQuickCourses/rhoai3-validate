@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Model Validation for Business Applications :: FIXME Course Title</title>
+    <link rel="next" href="chapter1/index.html">
+    <meta name="generator" content="Antora 3.1.3">
+    <link rel="stylesheet" href="../../_/css/site.css">
+    <script>var uiRootPath = '../../_'</script>
+  </head>
+  <body class="article">
+<header class="header">
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="https://www.redhat.com" target="_blank"><img src="../../_/img/redhat-logo.png" height="40px" alt="Red Hat"></a>
+      <a class="navbar-item" style="font-size: 24px; color: white" href="../..">FIXME Course Title</a>
+      <button class="navbar-burger" data-target="topbar-nav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div id="topbar-nav" class="navbar-menu">
+      <div class="navbar-end">
+        <a class="navbar-item" href="https://github.com/RedHatQuickCourses/REPLACEREPONAME/issues" target="_blank">Report Issues</a>
+      </div>
+    </div>
+  </nav>
+</header>
+<div class="body">
+<div class="nav-container" data-component="rhoai3-validate" data-version="1">
+  <aside class="nav">
+    <div class="panels">
+<div class="nav-panel-menu is-active" data-panel="menu">
+  <nav class="nav-menu">
+    <h3 class="title"><a href="index.html">Model Validation for Business Applications</a></h3>
+<ul class="nav-list">
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="1">
+    <a class="nav-link" href="index.html">Introduction &amp; Business Value</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter1/index.html">Chapter 1: Understanding Business Value</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/index.html">Chapter 2: Application-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter3/index.html">Chapter 3: Deploying Validation Services</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter1/index.html">Understanding Business Value</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter1/business-requirements.html">Defining Business Requirements</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter1/validation-criteria.html">Creating Validation Criteria</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter1/roi-measurement.html">Measuring Validation ROI</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/index.html">Application-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/multilang-validation.html">Multi-Language Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/performance-validation.html">Performance Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/domain-validation.html">Domain-Specific Validation</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter2/results-analysis.html">Results Analysis &amp; Business Insights</a>
+  </li>
+</ul>
+  </li>
+  <li class="nav-item" data-depth="0">
+<ul class="nav-list">
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter3/index.html">Deploying Validation Services</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter3/validation-service-design.html">Validation Service Design</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter3/deploy-validation-service.html">Deploy Validation Service</a>
+  </li>
+  <li class="nav-item" data-depth="1">
+    <a class="nav-link" href="chapter3/automated-validation.html">Automated Validation Pipeline</a>
+  </li>
+</ul>
+  </li>
+</ul>
+  </nav>
+</div>
+<div class="nav-panel-explore" data-panel="explore">
+  <div class="context">
+    <span class="title">Model Validation for Business Applications</span>
+    <span class="version">1</span>
+  </div>
+  <ul class="components">
+    <li class="component is-current">
+      <a class="title" href="index.html">Model Validation for Business Applications</a>
+      <ul class="versions">
+        <li class="version is-current is-latest">
+          <a href="index.html">1</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+    </div>
+  </aside>
+</div>
+<main class="article">
+<div class="toolbar" role="navigation">
+<button class="nav-toggle"></button>
+<nav class="breadcrumbs" aria-label="breadcrumbs">
+  <ul>
+    <li><a href="index.html">Model Validation for Business Applications</a></li>
+    <li><a href="index.html">Introduction &amp; Business Value</a></li>
+  </ul>
+</nav>
+</div>
+  <div class="content">
+<aside class="toc sidebar" data-title="Contents" data-levels="2">
+  <div class="toc-menu"></div>
+</aside>
+<article class="doc">
+<h1 class="page">Model Validation for Business Applications</h1>
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph lead">
+<p><strong>Validating a model for your specific application is where AI investments pay off.</strong></p>
+</div>
+<div class="paragraph">
+<p>You&#8217;ve deployed a model. You&#8217;ve tuned it for performance. But the critical question remains: <strong>"Does this model work for MY business application?"</strong></p>
+</div>
+<div class="paragraph">
+<p>This course teaches you to answer that question systematically by validating models against real-world business requirements and deploying validation services that ensure ongoing quality.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_business_value_of_model_validation"><a class="anchor" href="#_the_business_value_of_model_validation"></a>The Business Value of Model Validation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Model validation is not just about technical metrics—it&#8217;s about <strong>business outcomes</strong>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Risk Mitigation:</strong> Catch model failures before they impact customers</p>
+</li>
+<li>
+<p><strong>Cost Optimization:</strong> Deploy only models that deliver value for your use case</p>
+</li>
+<li>
+<p><strong>Compliance:</strong> Ensure models meet regulatory requirements for your industry</p>
+</li>
+<li>
+<p><strong>Confidence:</strong> Make data-driven decisions about model deployment and updates</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="_the_validation_challenge"><a class="anchor" href="#_the_validation_challenge"></a>The Validation Challenge</h3>
+<div class="paragraph">
+<p>A model that performs well on general benchmarks may fail on your specific use case:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Domain Knowledge:</strong> Does it understand your industry terminology?</p>
+</li>
+<li>
+<p><strong>Application Context:</strong> Can it handle your specific workflows?</p>
+</li>
+<li>
+<p><strong>Performance Requirements:</strong> Does it meet your latency and throughput needs?</p>
+</li>
+<li>
+<p><strong>Quality Standards:</strong> Does it meet your accuracy and safety thresholds?</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_course_structure"><a class="anchor" href="#_course_structure"></a>Course Structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This course is organized into three modules:</p>
+</div>
+<div class="sect2">
+<h3 id="_module_1_understanding_business_value"><a class="anchor" href="#_module_1_understanding_business_value"></a>Module 1: Understanding Business Value</h3>
+<div class="paragraph">
+<p>Learn why validation matters for business applications and how to define validation criteria based on business requirements.</p>
+</div>
+<div class="paragraph">
+<p><strong>What you&#8217;ll learn:</strong>
+* How to translate business requirements into validation criteria
+* The difference between general benchmarks and application-specific validation
+* How to measure ROI of model validation efforts</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_module_2_application_specific_validation"><a class="anchor" href="#_module_2_application_specific_validation"></a>Module 2: Application-Specific Validation</h3>
+<div class="paragraph">
+<p>Hands-on labs for validating models across multiple dimensions relevant to business applications:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Multi-Language Validation:</strong> Ensure models work across global markets</p>
+</li>
+<li>
+<p><strong>Performance Validation:</strong> Verify models meet production performance requirements</p>
+</li>
+<li>
+<p><strong>Domain-Specific Validation:</strong> Test models on business-relevant scenarios</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>What you&#8217;ll learn:</strong>
+* How to create custom validation datasets for your application
+* How to run comprehensive validation tests using TrustyAI and GuideLLM
+* How to interpret validation results in business context</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_module_3_deploying_validation_services"><a class="anchor" href="#_module_3_deploying_validation_services"></a>Module 3: Deploying Validation Services</h3>
+<div class="paragraph">
+<p>Deploy automated validation services in OpenShift AI that continuously monitor model quality.</p>
+</div>
+<div class="paragraph">
+<p><strong>What you&#8217;ll learn:</strong>
+* How to deploy validation services as Kubernetes workloads
+* How to automate validation pipelines
+* How to integrate validation into your deployment workflow</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Before starting this course, ensure you have:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Completed the <strong>rhoai3-deploy</strong> course (model is deployed as an InferenceService)</p>
+</li>
+<li>
+<p>Access to an OpenShift AI 3.0+ cluster</p>
+</li>
+<li>
+<p>The <code>oc</code> CLI tool installed and configured</p>
+</li>
+<li>
+<p>Basic understanding of Kubernetes and OpenShift</p>
+</li>
+<li>
+<p>Familiarity with model evaluation concepts</p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="title">Verify Your Environment</div>
+<div class="paragraph">
+<p>Before proceeding, verify your model is deployed and ready:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Check your InferenceService status
+oc get inferenceservice -n &lt;your-namespace&gt;
+
+# Verify the service is ready
+oc get inferenceservice &lt;your-model-name&gt; -n &lt;your-namespace&gt; \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should be <code>True</code>. If not, complete the rhoai3-deploy course first.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_expected_outcomes"><a class="anchor" href="#_expected_outcomes"></a>Expected Outcomes</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>By the end of this course, you will have:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Defined validation criteria based on business requirements</p>
+</li>
+<li>
+<p>Run comprehensive validation tests across accuracy, performance, and domain knowledge</p>
+</li>
+<li>
+<p>Deployed automated validation services in OpenShift AI</p>
+</li>
+<li>
+<p>Created validation reports suitable for stakeholder review</p>
+</li>
+<li>
+<p>Integrated validation into your model deployment workflow</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_course_duration"><a class="anchor" href="#_course_duration"></a>Course Duration</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Estimated Time:</strong> 4-6 hours</p>
+</li>
+<li>
+<p><strong>Format:</strong> Hands-on labs with command-line workflows</p>
+</li>
+<li>
+<p><strong>Deliverable:</strong> Deployed validation service monitoring your model</p>
+</li>
+</ul>
+</div>
+<hr>
+<div class="paragraph">
+<p><strong>Ready to validate? Let&#8217;s start by understanding the business value.</strong></p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="next"><a href="chapter1/index.html">Chapter 1: Understanding Business Value</a></span>
+</nav>
+</article>
+  </div>
+</main>
+</div>
+<footer class="footer">
+  <img src="../../_/img/rhl-logo-red.png" height="40px" alt="Red Hat"  href="https://redhat.com" >
+</footer><script id="site-script" src="../../_/js/site.js" data-ui-root-path="../../_"></script>
+<script async src="../../_/js/vendor/highlight.js"></script>
+  </body>
+</html>
