@@ -1,0 +1,115 @@
+= Model Validation for Business Applications
+:navtitle: Introduction
+:toc: macro
+
+// Antora metadata
+:page-role: Platform Engineer / MLOps Engineer
+:description: Learn to validate AI models for specific business applications and deploy validation services in Red Hat OpenShift AI.
+
+[.lead]
+*Validating a model for your specific application is where AI investments pay off.*
+
+You've deployed a model. You've tuned it for performance. But the critical question remains: **"Does this model work for MY business application?"**
+
+This course teaches you to answer that question systematically by validating models against real-world business requirements and deploying validation services that ensure ongoing quality.
+
+== The Business Value of Model Validation
+
+Model validation is not just about technical metrics—it's about **business outcomes**:
+
+* **Risk Mitigation:** Catch model failures before they impact customers
+* **Cost Optimization:** Deploy only models that deliver value for your use case
+* **Compliance:** Ensure models meet regulatory requirements for your industry
+* **Confidence:** Make data-driven decisions about model deployment and updates
+
+=== The Validation Challenge
+
+A model that performs well on general benchmarks may fail on your specific use case:
+
+* **Domain Knowledge:** Does it understand your industry terminology?
+* **Application Context:** Can it handle your specific workflows?
+* **Performance Requirements:** Does it meet your latency and throughput needs?
+* **Quality Standards:** Does it meet your accuracy and safety thresholds?
+
+== Course Structure
+
+This course is organized into three modules:
+
+=== Module 1: Understanding Business Value
+
+Learn why validation matters for business applications and how to define validation criteria based on business requirements.
+
+**What you'll learn:**
+* How to translate business requirements into validation criteria
+* The difference between general benchmarks and application-specific validation
+* How to measure ROI of model validation efforts
+
+=== Module 2: Application-Specific Validation
+
+Hands-on labs for validating models across multiple dimensions relevant to business applications:
+
+* **Multi-Language Validation:** Ensure models work across global markets
+* **Performance Validation:** Verify models meet production performance requirements
+* **Domain-Specific Validation:** Test models on business-relevant scenarios
+
+**What you'll learn:**
+* How to create custom validation datasets for your application
+* How to run comprehensive validation tests using TrustyAI and GuideLLM
+* How to interpret validation results in business context
+
+=== Module 3: Deploying Validation Services
+
+Deploy automated validation services in OpenShift AI that continuously monitor model quality.
+
+**What you'll learn:**
+* How to deploy validation services as Kubernetes workloads
+* How to automate validation pipelines
+* How to integrate validation into your deployment workflow
+
+== Prerequisites
+
+Before starting this course, ensure you have:
+
+* Completed the **rhoai3-deploy** course (model is deployed as an InferenceService)
+* Access to an OpenShift AI 3.0+ cluster
+* The `oc` CLI tool installed and configured
+* Basic understanding of Kubernetes and OpenShift
+* Familiarity with model evaluation concepts
+
+[IMPORTANT]
+.Verify Your Environment
+====
+Before proceeding, verify your model is deployed and ready:
+
+[source,bash]
+----
+# Check your InferenceService status
+oc get inferenceservice -n <your-namespace>
+
+# Verify the service is ready
+oc get inferenceservice <your-model-name> -n <your-namespace> \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'
+----
+
+The output should be `True`. If not, complete the rhoai3-deploy course first.
+====
+
+== Expected Outcomes
+
+By the end of this course, you will have:
+
+* Defined validation criteria based on business requirements
+* Run comprehensive validation tests across accuracy, performance, and domain knowledge
+* Deployed automated validation services in OpenShift AI
+* Created validation reports suitable for stakeholder review
+* Integrated validation into your model deployment workflow
+
+== Course Duration
+
+* **Estimated Time:** 4-6 hours
+* **Format:** Hands-on labs with command-line workflows
+* **Deliverable:** Deployed validation service monitoring your model
+
+---
+
+*Ready to validate? Let's start by understanding the business value.*
