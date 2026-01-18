@@ -1,4 +1,5 @@
-* xref:index.adoc[Introduction & Business Value]
+* xref:introduction.adoc[Introduction]
+* xref:index.adoc[Business Value]
 * xref:chapter1:index.adoc[Chapter 1: Understanding Business Value]
 * xref:chapter2:index.adoc[Chapter 2: Application-Specific Validation]
 * xref:chapter3:index.adoc[Chapter 3: Deploying Validation Services]
