@@ -40,9 +40,10 @@ This course is organized into three modules:
 Learn why validation matters for business applications and how to define validation criteria based on business requirements.
 
 **What you'll learn:**
-* How to translate business requirements into validation criteria
-* The difference between general benchmarks and application-specific validation
-* How to measure ROI of model validation efforts
+
+ * How to translate business requirements into validation criteria
+ * The difference between general benchmarks and application-specific validation
+ * How to measure ROI of model validation efforts
 
 === Module 2: Application-Specific Validation
 
@@ -53,18 +54,20 @@ Hands-on labs for validating models across multiple dimensions relevant to busin
 * **Domain-Specific Validation:** Test models on business-relevant scenarios
 
 **What you'll learn:**
-* How to create custom validation datasets for your application
-* How to run comprehensive validation tests using TrustyAI and GuideLLM
-* How to interpret validation results in business context
+
+ * How to create custom validation datasets for your application
+ * How to run comprehensive validation tests using TrustyAI and GuideLLM
+ * How to interpret validation results in business context
 
 === Module 3: Deploying Validation Services
 
 Deploy automated validation services in OpenShift AI that continuously monitor model quality.
 
 **What you'll learn:**
-* How to deploy validation services as Kubernetes workloads
-* How to automate validation pipelines
-* How to integrate validation into your deployment workflow
+
+ * How to deploy validation services as Kubernetes workloads
+ * How to automate validation pipelines
+ * How to integrate validation into your deployment workflow
 
 == Prerequisites
 

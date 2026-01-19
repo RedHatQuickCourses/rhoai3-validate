@@ -1,0 +1,37 @@
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: eval-custom-trivia
+  namespace: model-deploy-lab
+spec:
+  model: local-completions
+  taskList:
+    taskNames:
+      - custom-lmeval-task
+  modelArgs:
+    - name: model
+      value: granite-4-micro
+    - name: base_url
+      value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
+    - name: include_path
+      value: /opt/app-root/src/my_tasks
+    - name: tokenizer
+      value: ibm-granite/granite-4.0-micro
+  pod:
+    volumes:
+      - name: custom-benchmark-volume
+        configMap:
+          name: custom-lmeval-benchmark-files
+    container:
+      volumeMounts:
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/task.yaml
+          subPath: task.yaml
+          readOnly: true
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/data.jsonl
+          subPath: data.jsonl
+          readOnly: true
+  outputs:
+    pvcManaged:
+      size: 1Gi

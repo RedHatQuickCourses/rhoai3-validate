@@ -1,0 +1,22 @@
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: eval-granite-mmlu
+  namespace: model-deploy-lab
+spec:
+  allowOnline: true
+  model: local-completions
+  batchSize: 1
+  taskList:
+    taskNames:
+      - mmlu_abstract_algebra
+  modelArgs:
+    - name: model
+      value: granite-4-micro
+    - name: base_url
+      value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
+    - name: tokenizer
+      value: ibm-granite/granite-4.0-micro
+  outputs:
+    pvcManaged:
+      size: 1Gi

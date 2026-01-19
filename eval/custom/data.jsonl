@@ -1,0 +1,4 @@
+{"question": "What is the command-line tool for OpenShift?", "choices": ["kubectl", "oc", "docker", "podman"], "answer": 1}
+{"question": "What resource provides a DNS-resolvable URL?", "choices": ["Route", "Ingress", "Pod", "Build"], "answer": 0}
+{"question": "What is the default container runtime in OpenShift?", "choices": ["Docker", "CRI-O", "Containerd", "RKT"], "answer": 1}
+{"question": "Which operator manages AI/ML workloads?", "choices": ["Pipelines Operator", "Serverless Operator", "OpenShift AI Operator", "GitOps Operator"], "answer": 2}

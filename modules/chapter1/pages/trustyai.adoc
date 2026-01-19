@@ -4,7 +4,7 @@
 
 // Antora metadata
 :page-role: MLOps Engineer
-:description: Running standardized benchmarks (MMLU) against a deployed model using TrustyAI LMEvalJob.
+:description: Running standardized (MMLU) and custom benchmarks against a deployed model using TrustyAI LMEvalJob.
 
 [.lead]
 *Intelligence is measurable. Don't guess.*
@@ -12,8 +12,9 @@
 In the previous course, you deployed `granite-4-micro`. It responds to `curl` requests. But does it actually *know* anything?
 Deployment proves the pipes work. Evaluation proves the water is clean.
 
-In this module, you will use **Red Hat TrustyAI** to administer a standardized exam to your model.
-We will use the **LM-Eval** service to run the **MMLU (Massive Multitask Language Understanding)** benchmark, checking the model's reasoning capabilities in science, math, and humanities.
+In this module, you will use **Red Hat TrustyAI** to administer two exams:
+1.  **The Standardized Test:** MMLU (Massive Multitask Language Understanding) for general reasoning.
+2.  **The Custom Exam:** A domain-specific test you define yourself using `task.yaml`.
 
 == The Architecture: LMEvalJob
 
@@ -21,9 +22,8 @@ TrustyAI introduces a Kubernetes Custom Resource called `LMEvalJob`.
 When you submit this job, the TrustyAI Operator:
 1.  Spins up a driver pod.
 2.  Downloads the exam questions (datasets).
-3.  Connects to your model (via API or Local Weights).
+3.  Connects to your model (via `local-completions` API).
 4.  Grades the answers and stores the report.
-
 
 == Phase 1: The Pre-Flight Check (Admin Task)
 
@@ -51,38 +51,13 @@ oc get datasciencecluster -n redhat-ods-operator -o yaml | grep permitOnline
 oc patch datasciencecluster default-dsc -n redhat-ods-operator --type merge \
   -p '{"spec":{"components":{"trustyai":{"eval":{"lmeval":{"permitOnline":"allow"}}}}}}'
 ----
-*Why?* This allows the `LMEvalJob` to fetch the MMLU dataset dynamically.
+*Why?* This allows the `LMEvalJob` to fetch datasets dynamically.
 
-== Phase 2: Design the Exam
+== Phase 2: The Standardized Test (MMLU)
 
-We need to define *how* we test the model.
-We have two architectural choices for connecting to the model:
+First, let's establish a baseline using a public benchmark.
 
-[cols="1,1"]
-|===
-| Option A: Internal (Weights) | Option B: External (API)
-
-| **Mechanism:** `model: hf`
-| **Mechanism:** `model: local-completions`
-
-| Downloads the model weights *inside* the eval pod.
-| Sends requests to your *running* vLLM Service.
-
-| **Pros:** Isolates the model logic.
-| **Pros:** Tests the *actual* production stack.
-
-| **Cons:** Requires a massive Pod (GPU + RAM).
-| **Cons:** Network latency impacts duration (not score).
-|===
-
-**Our Choice:** **Option B (External)**.
-We want to validate the `granite-4-micro` service we deployed in the previous course. This uses a tiny evaluation pod because the heavy lifting happens on the vLLM server.
-
-== Phase 3: The Evaluation Job
-
-Create the following manifest. Note that we target the internal Service DNS of your deployed model to keep traffic within the cluster.
-
-.Create `eval-granite.yaml`
+.Create `eval-granite-mmlu.yaml`
 [source,yaml]
 ----
 apiVersion: trustyai.opendatahub.io/v1alpha1
@@ -97,7 +72,6 @@ spec:
   taskList:
     taskNames:
       # We select a tiny subset of MMLU for speed.
-      # In production, use "mmlu" for the full suite.
       - mmlu_abstract_algebra
   modelArgs:
     - name: model
@@ -107,7 +81,7 @@ spec:
       # Format: http://<isvc-name>-predictor.<namespace>.svc:8080/v1/completions
       value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
     - name: tokenizer
-      value: ibm-granite/granite-3.0-2b-instruct # Metadata for token counting
+      value: ibm-granite/granite-3.0-2b-instruct
   outputs:
     pvcManaged:
       size: 1Gi # Stores the results in a temporary PVC
@@ -116,54 +90,118 @@ spec:
 . **Submit the Exam:**
 [source,bash]
 ----
-oc apply -f eval-granite.yaml
+oc apply -f eval-granite-mmlu.yaml
+----
+
+== Phase 3: The Custom Exam (Domain Specific)
+
+Standard benchmarks don't test *your* data. Let's create a custom "OpenShift Trivia" exam.
+
+=== Step 3.1: Define the Exam Material
+We need two files: the questions (`data.jsonl`) and the instructions (`task.yaml`).
+
+. **Create the Data (`data.jsonl`):**
+[source,json]
+----
+{"question": "What is the command-line tool for OpenShift?", "choices": ["kubectl", "oc", "docker", "podman"], "answer": 1}
+{"question": "What resource provides a DNS-resolvable URL?", "choices": ["Route", "Ingress", "Pod", "Build"], "answer": 0}
+----
+
+. **Create the Instructions (`task.yaml`):**
+[source,yaml]
+----
+task: custom-lmeval-task
+dataset_path: json
+dataset_kwargs:
+  data_files: "/opt/app-root/src/my_tasks/data.jsonl" # Must match mount path below
+doc_to_choice: choices
+doc_to_text: "Question: {{question}}\n\nChoices:\n{% for choice in choices %}- ({{'ABCD'[loop.index0]}}) {{choice}}\n{% endfor %}\nAnswer:"
+doc_to_target: answer
+output_type: multiple_choice
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0
+----
+
+. **Bundle into a ConfigMap:**
+[source,bash]
+----
+oc create configmap custom-lmeval-benchmark-files \
+  --from-file=task.yaml=task.yaml \
+  --from-file=data.jsonl=data.jsonl \
+  -n model-deploy-lab
+----
+
+=== Step 3.2: Run the Custom Job
+Now we deploy a job that *mounts* this ConfigMap into the evaluator pod.
+
+.Create `eval-custom.yaml`
+[source,yaml]
+----
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: eval-custom-trivia
+  namespace: model-deploy-lab
+spec:
+  model: local-completions
+  taskList:
+    taskNames:
+      - custom-lmeval-task # Matches task.yaml
+  modelArgs:
+    - name: model
+      value: granite-4-micro
+    - name: base_url
+      value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
+    - name: include_path # Tells LM-Eval where to find the task definition
+      value: /opt/app-root/src/my_tasks
+    - name: tokenizer
+      value: ibm-granite/granite-3.0-2b-instruct
+  pod:
+    volumes:
+      - name: custom-benchmark-volume
+        configMap:
+          name: custom-lmeval-benchmark-files
+    container:
+      volumeMounts:
+        # Mount the Task Definition
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/task.yaml
+          subPath: task.yaml
+          readOnly: true
+        # Mount the Data
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/data.jsonl
+          subPath: data.jsonl
+          readOnly: true
+  outputs:
+    pvcManaged:
+      size: 1Gi
+----
+
+. **Submit the Custom Exam:**
+[source,bash]
+----
+oc apply -f eval-custom.yaml
 ----
 
 == Phase 4: Analyze the Results
 
 . **Monitor the Proctor:**
-Watch the job status. It moves from `Pending` -> `Running` -> `Complete`.
 [source,bash]
 ----
-oc get lmevaljob eval-granite-mmlu -w
+oc get lmevaljob eval-custom-trivia -w
 ----
 
 . **Read the Report Card:**
-Once the status is `Complete`, the results are stored in the Status field of the CR.
 [source,bash]
 ----
-oc get lmevaljob eval-granite-mmlu -o jsonpath='{.status.results}' | jq
+oc get lmevaljob eval-custom-trivia -o jsonpath='{.status.results}' | jq
 ----
 
-. **Pass/Fail Criteria:**
-Look for the `acc` (Accuracy) score.
-[source,json]
-----
-{
-  "results": {
-    "mmlu_abstract_algebra": {
-      "acc": 0.34,
-      "acc_stderr": 0.04
-    }
-  }
-}
-----
-* *Interpretation:* A score of `0.34` (34%) on Abstract Algebra might seem low, but for a 2B parameter model (Micro), it establishes a baseline.
-* *Action:* If you deploy `Granite-8B`, you expect this number to jump to `0.45+`. If it drops, your quantization strategy damaged the model.
-
-== Advanced: Persisting Results to S3
-
-In a real factory, you don't want results trapped in a CR status. You want them in your Data Lake.
-You can configure the job to write full JSON logs to the `models` bucket we created in the Fast Track.
-
-[source,yaml]
-----
-  outputs:
-    s3:
-      bucket: models
-      path: "eval-reports/granite-4-micro/"
-      secretName: models # Reusing our existing data connection secret
-----
-*Note: This requires configuring the `s3` section in the `offline` spec or `outputs` depending on the RHOAI version.*
+* *Expectation:* If your model knows OpenShift, the `acc` score should be high (e.g., `1.0` for 2 questions). If it guesses randomly (A, B, C, D), the score will be ~0.25.
 
 xref:performance-guidellm.adoc[Next: The Stress Test (Performance)]
