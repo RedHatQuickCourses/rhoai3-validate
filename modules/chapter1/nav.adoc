@@ -1,5 +1,5 @@
 * xref:introduction.adoc[Introduction]
-** xref:index.adoc[Business Value]
+* xref:trustyai.adoc[TrustyAI]
 *** xref:business-requirements.adoc[Understanding Business Value]
 ** xref:roi-measurement.adoc[Application-Specific Validation]
 ** xref:validation-criteria.adoc[CDeploying Validation Services]
