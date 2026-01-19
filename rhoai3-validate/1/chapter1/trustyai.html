@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Lab: The Accuracy Exam (TrustyAI) :: Model Validation for Business Applications</title>
     <link rel="prev" href="introduction.html">
-    <link rel="next" href="business-requirements.html">
+    <link rel="next" href="perf-guidellm.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -47,23 +47,23 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
+    <button class="nav-item-toggle"></button>
     <a class="nav-link" href="introduction.html">Introduction</a>
-  </li>
-  <li class="nav-item is-current-page" data-depth="1">
-    <button class="nav-item-toggle"></button>
+<ul class="nav-list">
+  <li class="nav-item is-current-page" data-depth="2">
     <a class="nav-link" href="trustyai.html">TrustyAI</a>
-<ul class="nav-list">
+  </li>
   <li class="nav-item" data-depth="2">
-    <button class="nav-item-toggle"></button>
+    <a class="nav-link" href="perf-guidellm.html">GuideLLM</a>
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="business-requirements.html">Understanding Business Value</a>
-<ul class="nav-list">
-  <li class="nav-item" data-depth="3">
+  </li>
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="roi-measurement.html">Application-Specific Validation</a>
   </li>
-  <li class="nav-item" data-depth="3">
+  <li class="nav-item" data-depth="2">
     <a class="nav-link" href="validation-criteria.html">CDeploying Validation Services</a>
-  </li>
-</ul>
   </li>
 </ul>
   </li>
@@ -139,6 +139,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Model Validation for Business Applications</a></li>
+    <li><a href="introduction.html">Introduction</a></li>
     <li><a href="trustyai.html">TrustyAI</a></li>
   </ul>
 </nav>
@@ -159,8 +160,9 @@
 Deployment proves the pipes work. Evaluation proves the water is clean.</p>
 </div>
 <div class="paragraph">
-<p>In this module, you will use <strong>Red Hat TrustyAI</strong> to administer a standardized exam to your model.
-We will use the <strong>LM-Eval</strong> service to run the <strong>MMLU (Massive Multitask Language Understanding)</strong> benchmark, checking the model&#8217;s reasoning capabilities in science, math, and humanities.</p>
+<p>In this module, you will use <strong>Red Hat TrustyAI</strong> to administer two exams:
+1.  <strong>The Standardized Test:</strong> MMLU (Massive Multitask Language Understanding) for general reasoning.
+2.  <strong>The Custom Exam:</strong> A domain-specific test you define yourself using <code>task.yaml</code>.</p>
 </div>
 </div>
 </div>
@@ -172,7 +174,7 @@ We will use the <strong>LM-Eval</strong> service to run the <strong>MMLU (Massiv
 When you submit this job, the TrustyAI Operator:
 1.  Spins up a driver pod.
 2.  Downloads the exam questions (datasets).
-3.  Connects to your model (via API or Local Weights).
+3.  Connects to your model (via <code>local-completions</code> API).
 4.  Grades the answers and stores the report.</p>
 </div>
 </div>
@@ -229,61 +231,18 @@ When you submit this job, the TrustyAI Operator:
 </div>
 </div>
 <div class="paragraph">
-<p><strong>Why?</strong> This allows the <code>LMEvalJob</code> to fetch the MMLU dataset dynamically.</p>
+<p><strong>Why?</strong> This allows the <code>LMEvalJob</code> to fetch datasets dynamically.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_phase_2_design_the_exam"><a class="anchor" href="#_phase_2_design_the_exam"></a>Phase 2: Design the Exam</h2>
+<h2 id="_phase_2_the_standardized_test_mmlu"><a class="anchor" href="#_phase_2_the_standardized_test_mmlu"></a>Phase 2: The Standardized Test (MMLU)</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>We need to define <strong>how</strong> we test the model.
-We have two architectural choices for connecting to the model:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Option A: Internal (Weights)</th>
-<th class="tableblock halign-left valign-top">Option B: External (API)</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Mechanism:</strong> <code>model: hf</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Mechanism:</strong> <code>model: local-completions</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Downloads the model weights <strong>inside</strong> the eval pod.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sends requests to your <strong>running</strong> vLLM Service.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Pros:</strong> Isolates the model logic.</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Pros:</strong> Tests the <strong>actual</strong> production stack.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Cons:</strong> Requires a massive Pod (GPU + RAM).</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>Cons:</strong> Network latency impacts duration (not score).</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><strong>Our Choice:</strong> <strong>Option B (External)</strong>.
-We want to validate the <code>granite-4-micro</code> service we deployed in the previous course. This uses a tiny evaluation pod because the heavy lifting happens on the vLLM server.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_phase_3_the_evaluation_job"><a class="anchor" href="#_phase_3_the_evaluation_job"></a>Phase 3: The Evaluation Job</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Create the following manifest. Note that we target the internal Service DNS of your deployed model to keep traffic within the cluster.</p>
+<p>First, let&#8217;s establish a baseline using a public benchmark.</p>
 </div>
 <div class="listingblock">
-<div class="title">Create <code>eval-granite.yaml</code></div>
+<div class="title">Create <code>eval-granite-mmlu.yaml</code></div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: trustyai.opendatahub.io/v1alpha1
 kind: LMEvalJob
@@ -297,7 +256,6 @@ spec:
   taskList:
     taskNames:
       # We select a tiny subset of MMLU for speed.
-      # In production, use "mmlu" for the full suite.
       - mmlu_abstract_algebra
   modelArgs:
     - name: model
@@ -307,7 +265,7 @@ spec:
       # Format: http://&lt;isvc-name&gt;-predictor.&lt;namespace&gt;.svc:8080/v1/completions
       value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
     - name: tokenizer
-      value: ibm-granite/granite-3.0-2b-instruct # Metadata for token counting
+      value: ibm-granite/granite-3.0-2b-instruct
   outputs:
     pvcManaged:
       size: 1Gi # Stores the results in a temporary PVC</code></pre>
@@ -322,7 +280,136 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>oc apply -f eval-granite.yaml</pre>
+<pre>oc apply -f eval-granite-mmlu.yaml</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_phase_3_the_custom_exam_domain_specific"><a class="anchor" href="#_phase_3_the_custom_exam_domain_specific"></a>Phase 3: The Custom Exam (Domain Specific)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Standard benchmarks don&#8217;t test <strong>your</strong> data. Let&#8217;s create a custom "OpenShift Trivia" exam.</p>
+</div>
+<div class="sect2">
+<h3 id="_step_3_1_define_the_exam_material"><a class="anchor" href="#_step_3_1_define_the_exam_material"></a>Step 3.1: Define the Exam Material</h3>
+<div class="paragraph">
+<p>We need two files: the questions (<code>data.jsonl</code>) and the instructions (<code>task.yaml</code>).</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Create the Data (<code>data.jsonl</code>):</strong></p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{"question": "What is the command-line tool for OpenShift?", "choices": ["kubectl", "oc", "docker", "podman"], "answer": 1}
+{"question": "What resource provides a DNS-resolvable URL?", "choices": ["Route", "Ingress", "Pod", "Build"], "answer": 0}</pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Create the Instructions (<code>task.yaml</code>):</strong></p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>task: custom-lmeval-task
+dataset_path: json
+dataset_kwargs:
+  data_files: "/opt/app-root/src/my_tasks/data.jsonl" # Must match mount path below
+doc_to_choice: choices
+doc_to_text: "Question: {{question}}\n\nChoices:\n{% for choice in choices %}- ({{'ABCD'[loop.index0]}}) {{choice}}\n{% endfor %}\nAnswer:"
+doc_to_target: answer
+output_type: multiple_choice
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 1.0</pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Bundle into a ConfigMap:</strong></p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>oc create configmap custom-lmeval-benchmark-files \
+  --from-file=task.yaml=task.yaml \
+  --from-file=data.jsonl=data.jsonl \
+  -n model-deploy-lab</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_2_run_the_custom_job"><a class="anchor" href="#_step_3_2_run_the_custom_job"></a>Step 3.2: Run the Custom Job</h3>
+<div class="paragraph">
+<p>Now we deploy a job that <strong>mounts</strong> this ConfigMap into the evaluator pod.</p>
+</div>
+<div class="listingblock">
+<div class="title">Create <code>eval-custom.yaml</code></div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: eval-custom-trivia
+  namespace: model-deploy-lab
+spec:
+  model: local-completions
+  taskList:
+    taskNames:
+      - custom-lmeval-task # Matches task.yaml
+  modelArgs:
+    - name: model
+      value: granite-4-micro
+    - name: base_url
+      value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
+    - name: include_path # Tells LM-Eval where to find the task definition
+      value: /opt/app-root/src/my_tasks
+    - name: tokenizer
+      value: ibm-granite/granite-3.0-2b-instruct
+  pod:
+    volumes:
+      - name: custom-benchmark-volume
+        configMap:
+          name: custom-lmeval-benchmark-files
+    container:
+      volumeMounts:
+        # Mount the Task Definition
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/task.yaml
+          subPath: task.yaml
+          readOnly: true
+        # Mount the Data
+        - name: custom-benchmark-volume
+          mountPath: /opt/app-root/src/my_tasks/data.jsonl
+          subPath: data.jsonl
+          readOnly: true
+  outputs:
+    pvcManaged:
+      size: 1Gi</code></pre>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Submit the Custom Exam:</strong></p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>oc apply -f eval-custom.yaml</pre>
+</div>
 </div>
 </div>
 </div>
@@ -333,79 +420,33 @@ spec:
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><strong>Monitor the Proctor:</strong>
-Watch the job status. It moves from <code>Pending</code> &#8594; <code>Running</code> &#8594; <code>Complete</code>.</p>
+<p><strong>Monitor the Proctor:</strong></p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>oc get lmevaljob eval-granite-mmlu -w</pre>
+<pre>oc get lmevaljob eval-custom-trivia -w</pre>
 </div>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p><strong>Read the Report Card:</strong>
-Once the status is <code>Complete</code>, the results are stored in the Status field of the CR.</p>
+<p><strong>Read the Report Card:</strong></p>
 </li>
 </ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>oc get lmevaljob eval-granite-mmlu -o jsonpath='{.status.results}' | jq</pre>
-</div>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p><strong>Pass/Fail Criteria:</strong>
-Look for the <code>acc</code> (Accuracy) score.</p>
-</li>
-</ol>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>{
-  "results": {
-    "mmlu_abstract_algebra": {
-      "acc": 0.34,
-      "acc_stderr": 0.04
-    }
-  }
-}</pre>
+<pre>oc get lmevaljob eval-custom-trivia -o jsonpath='{.status.results}' | jq</pre>
 </div>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Interpretation:</strong> A score of <code>0.34</code> (34%) on Abstract Algebra might seem low, but for a 2B parameter model (Micro), it establishes a baseline.</p>
-</li>
-<li>
-<p><strong>Action:</strong> If you deploy <code>Granite-8B</code>, you expect this number to jump to <code>0.45+</code>. If it drops, your quantization strategy damaged the model.</p>
+<p><strong>Expectation:</strong> If your model knows OpenShift, the <code>acc</code> score should be high (e.g., <code>1.0</code> for 2 questions). If it guesses randomly (A, B, C, D), the score will be ~0.25.</p>
 </li>
 </ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_advanced_persisting_results_to_s3"><a class="anchor" href="#_advanced_persisting_results_to_s3"></a>Advanced: Persisting Results to S3</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>In a real factory, you don&#8217;t want results trapped in a CR status. You want them in your Data Lake.
-You can configure the job to write full JSON logs to the <code>models</code> bucket we created in the Fast Track.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  outputs:
-    s3:
-      bucket: models
-      path: "eval-reports/granite-4-micro/"
-      secretName: models # Reusing our existing data connection secret</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p><strong>Note: This requires configuring the <code>s3</code> section in the <code>offline</code> spec or <code>outputs</code> depending on the RHOAI version.</strong></p>
 </div>
 <div class="paragraph">
 <p><a href="#performance-guidellm.adoc" class="xref unresolved">Next: The Stress Test (Performance)</a></p>
@@ -414,7 +455,7 @@ You can configure the job to write full JSON logs to the <code>models</code> buc
 </div>
 <nav class="pagination">
   <span class="prev"><a href="introduction.html">Introduction</a></span>
-  <span class="next"><a href="business-requirements.html">Understanding Business Value</a></span>
+  <span class="next"><a href="perf-guidellm.html">GuideLLM</a></span>
 </nav>
 </article>
   </div>
