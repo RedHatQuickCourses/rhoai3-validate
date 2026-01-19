@@ -1,4 +1,4 @@
-= Model Validation for Business Applications
+= Making the Most of Red Hat OpenShift AI Model Evaluation Tools
 :navtitle: Introduction
 :toc: macro
 

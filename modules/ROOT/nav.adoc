@@ -1,5 +1,1 @@
-* xref:chapter1:introduction.adoc[Introduction]
-* xref:chapter1:index.adoc[Business Value]
-* xref:chapter1:business-requirements.adoc[Chapter 1: Understanding Business Value]
-* xref:chapter1:roi-measurement.adoc[Chapter 1: Application-Specific Validation]
-* xref:chapter1:validation-criteria.adoc[Chapter 1: Deploying Validation Services]
+* xref:index.adoc[Introduction]

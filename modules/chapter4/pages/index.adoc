@@ -1,0 +1,98 @@
+= Model Evaluation: The Business Imperative
+:navtitle: Evaluation Lab
+:toc: macro
+
+// Antora metadata
+:page-role: MLOps Engineer
+:description: A standalone lab for evaluating deployed models on accuracy (TrustyAI), performance (GuideLLM), and domain capability.
+
+[.lead]
+*Deployment is not success. Verification is.*
+
+In the previous modules, you built the factory and served the model. But an API endpoint that returns garbage—or returns gold too slowly—is a liability, not an asset.
+
+Now comes the most critical phase of the AI Lifecycle: **The Audit.**
+"How good is this model, really? Can it speak Spanish? Does it crumble under load? Does it understand _our_ business?"
+
+This lab provides the answer. You will build a **Unified Evaluation Pipeline** that stress-tests your model across three dimensions to ensure it delivers real business value.
+
+
+== The Evaluation Challenge
+
+In production AI, "Good" is subjective. We need to make it objective.
+A comprehensive evaluation strategy must decouple the **Model** from the **Serving Infrastructure**.
+
+* **TrustyAI** measures the _Model's_ intelligence (Accuracy).
+* **GuideLLM** measures the _Infrastructure's_ capacity (Performance).
+* **Custom Probes** measure the _Business_ alignment (Domain).
+
+This lab provides a command-line workflow to run these disparate tests and aggregate the results into a single "Report Card" stored in S3.
+
+== The 3-Dimensional Framework
+
+We evaluate models against three distinct pillars. If a model fails any one of these, it is not production-ready.
+
+[cols="1,3,1"]
+|===
+| Dimension | Business Question | Tool
+
+| **1. Accuracy**
+| *"Does the model know the answers?"*
+Verifying multi-language capabilities and reasoning skills against standard benchmarks (MMLU, ARC).
+| **Red Hat TrustyAI** (LMEval)
+
+| **2. Performance**
+| *"Can the model handle the traffic?"*
+Stress-testing the infrastructure to find the breaking point (Max Throughput) and User Experience (Time-to-First-Token).
+| **GuideLLM**
+
+| **3. Domain**
+| *"Does the model understand OUR business?"*
+Testing the model against your specific industry terminology, compliance rules, and safety standards.
+| **Custom Probes**
+|===
+
+== Course Structure
+
+We have organized the audit into four modular phases.
+
+=== Module 1: The Accuracy Exam (TrustyAI)
+You will deploy a Kubernetes `LMEvalJob` to run standardized benchmarks against your model.
+* **Goal:** Verify the model outperforms the baseline in English and Spanish reasoning.
+
+=== Module 2: The Stress Test (GuideLLM)
+Accuracy means nothing if the user waits 10 seconds for a token. You will use **GuideLLM** to hammer the endpoint with simulated traffic.
+* **Goal:** Determine the maximum `Requests Per Second` (RPS) your hardware can sustain before latency spikes.
+
+=== Module 3: The Specialist Interview (Domain)
+Generic benchmarks don't test your business data. You will inject a custom "Exam Paper" specific to your domain.
+* **Goal:** Verify the model handles industry-specific jargon and safety constraints.
+
+=== Module 4: The Report Card (Visualization)
+Raw JSON data in S3 is hard to read. You will visualize the results to create a stakeholder-ready report.
+* **Goal:** Generate a "Pass/Fail" dashboard for the executive team.
+
+== Prerequisites & Fast Track
+
+This course is designed to be standalone. You do not need to have completed the previous courses, provided you have a running OpenShift AI environment.
+
+[IMPORTANT]
+.Choose Your Starting Point
+====
+**Option A: The Graduate (Sequential)**
+If you completed the *Model Serving* course, you already have a `granite-4-micro` model running. You are ready to go.
+
+**Option B: The Drop-In (Standalone)**
+If you are starting fresh here, run the **Fast Track Setup** to deploy the target infrastructure (MinIO, Data Connections, and a Model) automatically.
+
+[source,bash]
+----
+git clone https://github.com/RedHatQuickCourses/rhoai3-eval.git
+cd rhoai3-eval
+chmod +x setup/fast-track-eval.sh
+./setup/fast-track-eval.sh
+----
+====
+
+---
+*The model is waiting in the exam room. Let's begin the test.*

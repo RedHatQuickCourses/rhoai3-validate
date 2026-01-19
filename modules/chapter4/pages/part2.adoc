@@ -1,0 +1,145 @@
+= Lab: The Accuracy Exam (TrustyAI)
+:navtitle: Accuracy (LM-Eval)
+:toc: macro
+
+// Antora metadata
+:page-role: MLOps Engineer
+:description: Running standardized benchmarks (MMLU) against a deployed model using TrustyAI LMEvalJob.
+
+[.lead]
+*Intelligence is measurable. Don't guess.*
+
+In the previous course, you deployed `granite-4-micro`. It responds to `curl` requests. But does it actually *know* anything?
+Deployment proves the pipes work. Evaluation proves the water is clean.
+
+In this module, you will use **Red Hat TrustyAI** to administer a standardized exam to your model.
+We will use the **LM-Eval** service to run the **MMLU (Massive Multitask Language Understanding)** benchmark, checking the model's reasoning capabilities in science, math, and humanities.
+
+== The Architecture: LMEvalJob
+
+TrustyAI introduces a Kubernetes Custom Resource called `LMEvalJob`.
+When you submit this job, the TrustyAI Operator:
+1.  Spins up a driver pod.
+2.  Downloads the exam questions (datasets).
+3.  Connects to your model (via API or Local Weights).
+4.  Grades the answers and stores the report.
+
+
+== Phase 1: The Pre-Flight Check (Admin Task)
+
+[IMPORTANT]
+.Decision Point: Online vs. Air-Gapped
+====
+By default, RHOAI blocks evaluation jobs from accessing the internet.
+* **The Secure Path:** Manually download datasets to a PVC (Air-Gapped).
+* **The Fast Path:** Allow jobs to download datasets from Hugging Face directly.
+
+For this lab, we will use the **Fast Path**.
+====
+
+As a cluster administrator, you must explicitly enable "Online Mode" for the cluster.
+
+. **Check your DataScienceCluster config:**
+[source,bash]
+----
+oc get datasciencecluster -n redhat-ods-operator -o yaml | grep permitOnline
+----
+
+. **Enable Access (If set to `deny`):**
+[source,bash]
+----
+oc patch datasciencecluster default-dsc -n redhat-ods-operator --type merge \
+  -p '{"spec":{"components":{"trustyai":{"eval":{"lmeval":{"permitOnline":"allow"}}}}}}'
+----
+*Why?* This allows the `LMEvalJob` to fetch the MMLU dataset dynamically.
+
+== Phase 2: Design the Exam
+
+We need to define *how* we test the model.
+We have two architectural choices for connecting to the model:
+
+[cols="1,1"]
+|===
+| Option A: Internal (Weights) | Option B: External (API)
+
+| **Mechanism:** `model: hf`
+| **Mechanism:** `model: local-completions`
+
+| Downloads the model weights *inside* the eval pod.
+| Sends requests to your *running* vLLM Service.
+
+| **Pros:** Isolates the model logic.
+| **Pros:** Tests the *actual* production stack.
+
+| **Cons:** Requires a massive Pod (GPU + RAM).
+| **Cons:** Network latency impacts duration (not score).
+|===
+
+**Our Choice:** **Option B (External)**.
+We want to validate the `granite-4-micro` service we deployed in the previous course. This uses a tiny evaluation pod because the heavy lifting happens on the vLLM server.
+
+== Phase 3: The Evaluation Job
+
+Create the following manifest. Note that we target the internal Service DNS of your deployed model to keep traffic within the cluster.
+
+.Create `eval-granite.yaml`
+[source,yaml]
+----
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: eval-granite-mmlu
+  namespace: model-deploy-lab # Same namespace as your model
+spec:
+  allowOnline: true # Requires the Admin setting above
+  model: local-completions # Use the OpenAI-compatible API
+  batchSize: 1
+  taskList:
+    taskNames:
+      # We select a tiny subset of MMLU for speed.
+      # In production, use "mmlu" for the full suite.
+      - mmlu_abstract_algebra
+  modelArgs:
+    - name: model
+      value: granite-4-micro
+    - name: base_url
+      # The internal DNS of your KServe InferenceService
+      # Format: http://<isvc-name>-predictor.<namespace>.svc:8080/v1/completions
+      value: http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1/completions
+    - name: tokenizer
+      value: ibm-granite/granite-3.0-2b-instruct # Metadata for token counting
+  outputs:
+    pvcManaged:
+      size: 1Gi # Stores the results in a temporary PVC
+----
+
+. **Submit the Exam:**
+[source,bash]
+----
+oc apply -f eval-granite.yaml
+----
+
+== Phase 4: Analyze the Results
+
+. **Monitor the Proctor:**
+Watch the job status. It moves from `Pending` -> `Running` -> `Complete`.
+[source,bash]
+----
+oc get lmevaljob eval-granite-mmlu -w
+----
+
+. **Read the Report Card:**
+Once the status is `Complete`, the results are stored in the Status field of the CR.
+[source,bash]
+----
+oc get lmevaljob eval-granite-mmlu -o jsonpath='{.status.results}' | jq
+----
+
+. **Pass/Fail Criteria:**
+Look for the `acc` (Accuracy) score.
+[source,json]
+----
+{
+  "results": {
+    "mmlu_abstract_algebra": {
+      "acc": 0

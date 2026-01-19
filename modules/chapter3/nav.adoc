@@ -1,4 +1,4 @@
 * xref:index.adoc[Deploying Validation Services]
-* xref:validation-service-design.adoc[Validation Service Design]
-* xref:deploy-validation-service.adoc[Deploy Validation Service]
-* xref:automated-validation.adoc[Automated Validation Pipeline]
+** xref:validation-service-design.adoc[Validation Service Design]
+** xref:deploy-validation-service.adoc[Deploy Validation Service]
+** xref:automated-validation.adoc[Automated Validation Pipeline]
