@@ -1,0 +1,129 @@
+= Lab: The Stress Test (Performance)
+:navtitle: Performance (GuideLLM)
+:toc: macro
+
+// Antora metadata
+:page-role: SRE / Platform Engineer
+:description: Benchmarking vLLM throughput and latency using GuideLLM.
+
+[.lead]
+*Accuracy is irrelevant if the user waits 20 seconds for a "Hello".*
+
+In Module 1, we proved the model is smart. Now we must prove it is fast.
+A model that works perfectly for one user might crash under the load of 50 concurrent users. This is where **Performance Engineering** begins.
+
+In this lab, you will use **GuideLLM**, a specialized stress-testing tool for vLLM, to determine the "Breaking Point" of your deployment.
+
+
+
+== The Metrics That Matter
+
+We are not just measuring "speed." We are measuring two competing forces:
+
+1.  **Latency (TTFT):** *Time To First Token*. How long until the user sees the first word? (User Experience).
+2.  **Throughput (T/s):** *Tokens Per Second*. How much total text can the server generate? (Cost Efficiency).
+
+[NOTE]
+.The Trade-off
+====
+* **Low Batch Size (1 User):** fast Latency, low Throughput.
+* **High Batch Size (50 Users):** slow Latency, high Throughput.
+* **The Goal:** Find the "Knee of the Curve"—the maximum throughput before latency becomes unacceptable.
+====
+
+== Step 1: Design the Stress Test
+
+We will deploy `GuideLLM` as a Kubernetes Job. This ensures the test runs *inside* the cluster, right next to the model, eliminating internet lag from the results.
+
+We will run a **Sweep Test**. This slowly increases the load (Requests Per Second) until the server saturates.
+
+.Create `stress-granite.yaml`
+[source,yaml]
+----
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stress-test-granite
+  namespace: model-deploy-lab
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: guidellm
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: stressor
+          image: registry.access.redhat.com/ubi9/python-311:latest
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "⬇️ Installing GuideLLM..."
+              pip install guidellm --quiet
+              
+              echo "🔥 Starting Load Test..."
+              # --rate-type sweep: Increases load until performance degrades
+              # --data-type emulated: Uses synthetic data (no dataset required)
+              guidellm benchmark \
+                --target "http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1" \
+                --model "granite-4-micro" \
+                --data-type emulated \
+                --data "prompt_tokens=128,generated_tokens=128" \
+                --rate-type sweep \
+                --max-seconds 120
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"
+----
+
+== Step 2: Execute the Benchmark
+
+. **Submit the Job:**
+[source,bash]
+----
+oc apply -f stress-granite.yaml
+----
+
+. **Wait for Completion:**
+The installation and test will take roughly 3-5 minutes.
+[source,bash]
+----
+oc wait --for=condition=complete job/stress-test-granite -n model-deploy-lab --timeout=300s
+----
+
+== Step 3: Analyze the Logs
+
+The results are printed to the Pod logs.
+
+. **Fetch the Report:**
+[source,bash]
+----
+oc logs job/stress-test-granite -n model-deploy-lab
+----
+
+. **Interpret the Output:**
+Look for the **Summary Table** at the bottom of the log. It will look similar to this:
+
+[source,text]
+----
+| Rate (req/s) | TTFT (ms) | ITL (ms) | Throughput (tok/s) |
+|--------------|-----------|----------|--------------------|
+| 1.0          | 45        | 12       | 128                |
+| 5.0          | 55        | 14       | 640                |
+| 10.0         | 120       | 25       | 1200               |
+| 20.0         | 450       | 80       | 1800               | <--- Saturation Point
+----
+
+=== The Engineering Decision
+1.  **Green Zone (1-5 req/s):** Latency is low (45-55ms). Excellent user experience.
+2.  **Yellow Zone (10 req/s):** Latency jumps (120ms). Acceptable for chatbots.
+3.  **Red Zone (20+ req/s):** Latency is high (450ms). The GPU is saturated.
+
+**Action:** If your Service Level Objective (SLO) is "TTFT < 200ms", your single GPU can handle **~15 users** concurrently. If you need to support 100 users, you must scale your `InferenceService` replicas from 1 to 7.
+
+xref:domain-custom.adoc[Next: The Domain Interview (Custom Checks)]
