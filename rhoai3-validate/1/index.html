@@ -148,220 +148,220 @@
 </aside>
 <article class="doc">
 <h1 class="page">Making the Most of Red Hat OpenShift AI Model Evaluation Tools</h1>
-<h1 id="_model_validation_for_business_applications" class="sect0"><a class="anchor" href="#_model_validation_for_business_applications"></a>Model Validation for Business Applications</h1>
+<div id="preamble">
+<div class="sectionbody">
 <div class="paragraph lead">
-<p><strong>Validating a model for your specific application is where AI investments pay off.</strong></p>
+<p><strong>Validation is not a technical exercise—it&#8217;s a business imperative.</strong></p>
 </div>
 <div class="paragraph">
-<p>You&#8217;ve deployed a model. You&#8217;ve tuned it for performance. But the critical question remains: <strong>"Does this model work for MY business application?"</strong></p>
+<p>Before diving into validation techniques, we must understand why validation matters for business applications and how to align validation efforts with business goals.</p>
 </div>
-<div class="paragraph">
-<p>This course teaches you to answer that question systematically by validating models against real-world business requirements and deploying validation services that ensure ongoing quality.</p>
+</div>
 </div>
 <div class="sect1">
-<h2 id="_the_business_value_of_model_validation"><a class="anchor" href="#_the_business_value_of_model_validation"></a>The Business Value of Model Validation</h2>
+<h2 id="_why_validation_matters_for_business"><a class="anchor" href="#_why_validation_matters_for_business"></a>Why Validation Matters for Business</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Model validation is not just about technical metrics—it&#8217;s about <strong>business outcomes</strong>:</p>
+<p>Model validation answers critical business questions:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Risk Mitigation:</strong> Catch model failures before they impact customers</p>
+<p><strong>Will this model work for our customers?</strong> (Application fit)</p>
 </li>
 <li>
-<p><strong>Cost Optimization:</strong> Deploy only models that deliver value for your use case</p>
+<p><strong>Can we trust this model in production?</strong> (Risk management)</p>
 </li>
 <li>
-<p><strong>Compliance:</strong> Ensure models meet regulatory requirements for your industry</p>
+<p><strong>Does this model meet our quality standards?</strong> (Compliance)</p>
 </li>
 <li>
-<p><strong>Confidence:</strong> Make data-driven decisions about model deployment and updates</p>
+<p><strong>Is this model worth the deployment cost?</strong> (ROI)</p>
 </li>
 </ul>
 </div>
 <div class="sect2">
-<h3 id="_the_validation_challenge"><a class="anchor" href="#_the_validation_challenge"></a>The Validation Challenge</h3>
+<h3 id="_the_cost_of_skipping_validation"><a class="anchor" href="#_the_cost_of_skipping_validation"></a>The Cost of Skipping Validation</h3>
 <div class="paragraph">
-<p>A model that performs well on general benchmarks may fail on your specific use case:</p>
+<p>Organizations that skip proper validation face:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Domain Knowledge:</strong> Does it understand your industry terminology?</p>
+<p><strong>Production Failures:</strong> Models that work in testing but fail with real users</p>
 </li>
 <li>
-<p><strong>Application Context:</strong> Can it handle your specific workflows?</p>
+<p><strong>Customer Impact:</strong> Poor quality responses damage brand reputation</p>
 </li>
 <li>
-<p><strong>Performance Requirements:</strong> Does it meet your latency and throughput needs?</p>
+<p><strong>Wasted Investment:</strong> Deploying models that don&#8217;t deliver business value</p>
 </li>
 <li>
-<p><strong>Quality Standards:</strong> Does it meet your accuracy and safety thresholds?</p>
+<p><strong>Compliance Risk:</strong> Models that violate regulatory requirements</p>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_course_structure"><a class="anchor" href="#_course_structure"></a>Course Structure</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This course is organized into three modules:</p>
-</div>
-<div class="sect2">
-<h3 id="_module_1_understanding_business_value"><a class="anchor" href="#_module_1_understanding_business_value"></a>Module 1: Understanding Business Value</h3>
-<div class="paragraph">
-<p>Learn why validation matters for business applications and how to define validation criteria based on business requirements.</p>
-</div>
-<div class="paragraph">
-<p><strong>What you&#8217;ll learn:</strong>
-* How to translate business requirements into validation criteria
-* The difference between general benchmarks and application-specific validation
-* How to measure ROI of model validation efforts</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_module_2_application_specific_validation"><a class="anchor" href="#_module_2_application_specific_validation"></a>Module 2: Application-Specific Validation</h3>
+<h3 id="_the_value_of_proper_validation"><a class="anchor" href="#_the_value_of_proper_validation"></a>The Value of Proper Validation</h3>
 <div class="paragraph">
-<p>Hands-on labs for validating models across multiple dimensions relevant to business applications:</p>
+<p>Organizations that validate properly achieve:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Multi-Language Validation:</strong> Ensure models work across global markets</p>
+<p><strong>Confidence:</strong> Deploy models knowing they meet business requirements</p>
 </li>
 <li>
-<p><strong>Performance Validation:</strong> Verify models meet production performance requirements</p>
+<p><strong>Cost Savings:</strong> Avoid deploying unsuitable models</p>
 </li>
 <li>
-<p><strong>Domain-Specific Validation:</strong> Test models on business-relevant scenarios</p>
+<p><strong>Risk Mitigation:</strong> Catch issues before they impact customers</p>
+</li>
+<li>
+<p><strong>Better Decisions:</strong> Data-driven model selection and deployment</p>
 </li>
 </ul>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_business_requirements_vs_technical_metrics"><a class="anchor" href="#_business_requirements_vs_technical_metrics"></a>Business Requirements vs. Technical Metrics</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_general_benchmarks_dont_tell_the_full_story"><a class="anchor" href="#_general_benchmarks_dont_tell_the_full_story"></a>General Benchmarks Don&#8217;t Tell the Full Story</h3>
 <div class="paragraph">
-<p><strong>What you&#8217;ll learn:</strong>
-* How to create custom validation datasets for your application
-* How to run comprehensive validation tests using TrustyAI and GuideLLM
-* How to interpret validation results in business context</p>
+<p>Standard benchmarks (MMLU, ARC, HellaSwag) measure general model capabilities but don&#8217;t answer:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Does the model understand our industry terminology?</p>
+</li>
+<li>
+<p>Can it handle our specific use cases?</p>
+</li>
+<li>
+<p>Does it meet our performance requirements?</p>
+</li>
+<li>
+<p>Is it safe for our domain?</p>
+</li>
+</ul>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_module_3_deploying_validation_services"><a class="anchor" href="#_module_3_deploying_validation_services"></a>Module 3: Deploying Validation Services</h3>
+<h3 id="_application_specific_validation"><a class="anchor" href="#_application_specific_validation"></a>Application-Specific Validation</h3>
 <div class="paragraph">
-<p>Deploy automated validation services in OpenShift AI that continuously monitor model quality.</p>
-</div>
-<div class="paragraph">
-<p><strong>What you&#8217;ll learn:</strong>
-* How to deploy validation services as Kubernetes workloads
-* How to automate validation pipelines
-* How to integrate validation into your deployment workflow</p>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_prerequisites"><a class="anchor" href="#_prerequisites"></a>Prerequisites</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Before starting this course, ensure you have:</p>
+<p>Application-specific validation tests:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Completed the <strong>rhoai3-deploy</strong> course (model is deployed as an InferenceService)</p>
+<p><strong>Domain Knowledge:</strong> Understanding of your industry and terminology</p>
 </li>
 <li>
-<p>Access to an OpenShift AI 3.0+ cluster</p>
+<p><strong>Use Case Fit:</strong> Performance on your specific workflows</p>
 </li>
 <li>
-<p>The <code>oc</code> CLI tool installed and configured</p>
+<p><strong>Performance Requirements:</strong> Latency and throughput for your application</p>
 </li>
 <li>
-<p>Basic understanding of Kubernetes and OpenShift</p>
-</li>
-<li>
-<p>Familiarity with model evaluation concepts</p>
-</li>
-</ul>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-<div class="title">Verify Your Environment</div>
-<div class="paragraph">
-<p>Before proceeding, verify your model is deployed and ready:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-bash hljs" data-lang="bash"># Check your InferenceService status
-oc get inferenceservice -n &lt;your-namespace&gt;
-
-# Verify the service is ready
-oc get inferenceservice &lt;your-model-name&gt; -n &lt;your-namespace&gt; \
-  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}'</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The output should be <code>True</code>. If not, complete the rhoai3-deploy course first.</p>
-</div>
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_expected_outcomes"><a class="anchor" href="#_expected_outcomes"></a>Expected Outcomes</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>By the end of this course, you will have:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Defined validation criteria based on business requirements</p>
-</li>
-<li>
-<p>Run comprehensive validation tests across accuracy, performance, and domain knowledge</p>
-</li>
-<li>
-<p>Deployed automated validation services in OpenShift AI</p>
-</li>
-<li>
-<p>Created validation reports suitable for stakeholder review</p>
-</li>
-<li>
-<p>Integrated validation into your model deployment workflow</p>
+<p><strong>Quality Standards:</strong> Accuracy and safety thresholds for your use case</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_course_duration"><a class="anchor" href="#_course_duration"></a>Course Duration</h2>
+<h2 id="_the_validation_framework"><a class="anchor" href="#_the_validation_framework"></a>The Validation Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This course uses a three-dimensional validation framework:</p>
+</div>
+<div class="sect2">
+<h3 id="_1_accuracy_validation"><a class="anchor" href="#_1_accuracy_validation"></a>1. Accuracy Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Does the model produce correct answers?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Multi-language accuracy (for global applications)</p>
+</li>
+<li>
+<p>Domain-specific accuracy (for industry applications)</p>
+</li>
+<li>
+<p>Task-specific accuracy (for use case applications)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_2_performance_validation"><a class="anchor" href="#_2_performance_validation"></a>2. Performance Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Can the model serve requests fast enough?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Latency (user experience)</p>
+</li>
+<li>
+<p>Throughput (cost efficiency)</p>
+</li>
+<li>
+<p>Resource utilization (scalability)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_3_domain_validation"><a class="anchor" href="#_3_domain_validation"></a>3. Domain Validation</h3>
+<div class="paragraph">
+<p><strong>Business Question:</strong> "Does the model understand our business context?"</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Terminology understanding</p>
+</li>
+<li>
+<p>Workflow handling</p>
+</li>
+<li>
+<p>Compliance requirements</p>
+</li>
+<li>
+<p>Safety standards</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_next_steps"><a class="anchor" href="#_next_steps"></a>Next Steps</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Estimated Time:</strong> 4-6 hours</p>
+<p>Learn how to <a href="#business-requirements.adoc" class="xref unresolved">define business requirements</a> for validation</p>
 </li>
 <li>
-<p><strong>Format:</strong> Hands-on labs with command-line workflows</p>
+<p>Understand how to <a href="#validation-criteria.adoc" class="xref unresolved">create validation criteria</a> from requirements</p>
 </li>
 <li>
-<p><strong>Deliverable:</strong> Deployed validation service monitoring your model</p>
+<p>Discover how to <a href="#roi-measurement.adoc" class="xref unresolved">measure the ROI</a> of validation efforts</p>
 </li>
 </ul>
 </div>
 <hr>
 <div class="paragraph">
-<p><strong>Ready to validate? Let&#8217;s start by understanding the business value.</strong></p>
+<p><strong>Now let&#8217;s translate business requirements into validation criteria.</strong></p>
 </div>
 </div>
 </div>
