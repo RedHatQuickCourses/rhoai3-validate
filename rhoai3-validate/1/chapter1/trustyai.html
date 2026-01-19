@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Lab: The Accuracy Exam (TrustyAI) :: Model Validation for Business Applications</title>
+    <link rel="prev" href="introduction.html">
+    <link rel="next" href="business-requirements.html">
     <meta name="generator" content="Antora 3.1.3">
     <link rel="stylesheet" href="../../../_/css/site.css">
     <script>var uiRootPath = '../../../_'</script>
@@ -45,21 +47,21 @@
   <li class="nav-item" data-depth="0">
 <ul class="nav-list">
   <li class="nav-item" data-depth="1">
-    <a class="nav-link" href="../chapter1/introduction.html">Introduction</a>
+    <a class="nav-link" href="introduction.html">Introduction</a>
   </li>
-  <li class="nav-item" data-depth="1">
+  <li class="nav-item is-current-page" data-depth="1">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../chapter1/trustyai.html">TrustyAI</a>
+    <a class="nav-link" href="trustyai.html">TrustyAI</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="2">
     <button class="nav-item-toggle"></button>
-    <a class="nav-link" href="../chapter1/business-requirements.html">Understanding Business Value</a>
+    <a class="nav-link" href="business-requirements.html">Understanding Business Value</a>
 <ul class="nav-list">
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../chapter1/roi-measurement.html">Application-Specific Validation</a>
+    <a class="nav-link" href="roi-measurement.html">Application-Specific Validation</a>
   </li>
   <li class="nav-item" data-depth="3">
-    <a class="nav-link" href="../chapter1/validation-criteria.html">CDeploying Validation Services</a>
+    <a class="nav-link" href="validation-criteria.html">CDeploying Validation Services</a>
   </li>
 </ul>
   </li>
@@ -137,7 +139,7 @@
 <nav class="breadcrumbs" aria-label="breadcrumbs">
   <ul>
     <li><a href="../index.html">Model Validation for Business Applications</a></li>
-    <li><a href="part2.html">Lab: The Accuracy Exam (TrustyAI)</a></li>
+    <li><a href="trustyai.html">TrustyAI</a></li>
   </ul>
 </nav>
 </div>
@@ -367,11 +369,53 @@ Look for the <code>acc</code> (Accuracy) score.</p>
 <pre>{
   "results": {
     "mmlu_abstract_algebra": {
-      "acc": 0</pre>
+      "acc": 0.34,
+      "acc_stderr": 0.04
+    }
+  }
+}</pre>
+</div>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Interpretation:</strong> A score of <code>0.34</code> (34%) on Abstract Algebra might seem low, but for a 2B parameter model (Micro), it establishes a baseline.</p>
+</li>
+<li>
+<p><strong>Action:</strong> If you deploy <code>Granite-8B</code>, you expect this number to jump to <code>0.45+</code>. If it drops, your quantization strategy damaged the model.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_advanced_persisting_results_to_s3"><a class="anchor" href="#_advanced_persisting_results_to_s3"></a>Advanced: Persisting Results to S3</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In a real factory, you don&#8217;t want results trapped in a CR status. You want them in your Data Lake.
+You can configure the job to write full JSON logs to the <code>models</code> bucket we created in the Fast Track.</p>
 </div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-yaml hljs" data-lang="yaml">  outputs:
+    s3:
+      bucket: models
+      path: "eval-reports/granite-4-micro/"
+      secretName: models # Reusing our existing data connection secret</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Note: This requires configuring the <code>s3</code> section in the <code>offline</code> spec or <code>outputs</code> depending on the RHOAI version.</strong></p>
+</div>
+<div class="paragraph">
+<p><a href="#performance-guidellm.adoc" class="xref unresolved">Next: The Stress Test (Performance)</a></p>
+</div>
+</div>
+</div>
+<nav class="pagination">
+  <span class="prev"><a href="introduction.html">Introduction</a></span>
+  <span class="next"><a href="business-requirements.html">Understanding Business Value</a></span>
+</nav>
 </article>
   </div>
 </main>
