@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: stress-test-granite
+  namespace: model-deploy-lab
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: guidellm
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: stressor
+          image: registry.access.redhat.com/ubi9/python-311:latest
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              echo "⬇️ Installing GuideLLM..."
+              pip install guidellm --quiet
+              
+              echo "🔥 Starting Load Test..."
+              # --rate-type sweep: Increases load until performance degrades
+              # --data-type emulated: Uses synthetic data (no dataset required)
+              guidellm benchmark \
+                --target "http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1" \
+                --model "granite-4-micro" \
+                --data-type emulated \
+                --data "prompt_tokens=128,generated_tokens=128" \
+                --rate-type sweep \
+                --max-seconds 120
+          resources:
+            requests:
+              cpu: "1"
+              memory: "2Gi"
+            limits:
+              cpu: "2"
+              memory: "4Gi"

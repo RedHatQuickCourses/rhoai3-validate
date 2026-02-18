@@ -4,5 +4,3 @@ version: 1
 nav:
 - modules/ROOT/nav.adoc
 - modules/chapter1/nav.adoc
-- modules/chapter2/nav.adoc
-- modules/chapter3/nav.adoc

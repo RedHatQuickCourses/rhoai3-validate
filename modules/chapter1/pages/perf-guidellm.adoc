@@ -1,129 +1,226 @@
-= Lab: The Stress Test (Performance)
-:navtitle: Performance (GuideLLM)
+= Module 1.2: Fast-Track Environment Setup
+:navtitle: Fast-Track Setup
 :toc: macro
 
 // Antora metadata
-:page-role: SRE / Platform Engineer
-:description: Benchmarking vLLM throughput and latency using GuideLLM.
+:page-role: product-task
+:description: Automated scripts to provision MinIO and ingest the Granite 3.2 model for TrustyAI evaluation.
 
+[#setup]
 [.lead]
-*Accuracy is irrelevant if the user waits 20 seconds for a "Hello".*
+*To guard a model, you first need a model.*
 
-In Module 1, we proved the model is smart. Now we must prove it is fast.
-A model that works perfectly for one user might crash under the load of 50 concurrent users. This is where **Performance Engineering** begins.
-
-In this lab, you will use **GuideLLM**, a specialized stress-testing tool for vLLM, to determine the "Breaking Point" of your deployment.
-
-
-
-== The Metrics That Matter
-
-We are not just measuring "speed." We are measuring two competing forces:
-
-1.  **Latency (TTFT):** *Time To First Token*. How long until the user sees the first word? (User Experience).
-2.  **Throughput (T/s):** *Tokens Per Second*. How much total text can the server generate? (Cost Efficiency).
+TrustyAI does not run in a vacuum. It requires a live AI workload to monitor.
+In a real-world scenario, you might have an existing KServe or vLLM deployment.
+In this lab, we will build a dedicated "Sandbox" environment from scratch in less than 5 minutes.
 
 [NOTE]
-.The Trade-off
+.What this setup does
 ====
-* **Low Batch Size (1 User):** fast Latency, low Throughput.
-* **High Batch Size (50 Users):** slow Latency, high Throughput.
-* **The Goal:** Find the "Knee of the Curve"—the maximum throughput before latency becomes unacceptable.
+We will use two automated scripts to:
+
+1.  Create a namespace called `trustyai-lab`.
+2.  Deploy **MinIO** (S3-compatible storage) to act as our "Model Vault."
+3.  Configure the **RHOAI Data Connection** secrets automatically.
+4.  Run a Kubernetes Job to download **Granite 3.2 2B Instruct** from Hugging Face and upload it to your private MinIO vault.
 ====
 
-== Step 1: Design the Stress Test
+== Step 1: Infrastructure Setup (`setup.sh`)
 
-We will deploy `GuideLLM` as a Kubernetes Job. This ensures the test runs *inside* the cluster, right next to the model, eliminating internet lag from the results.
+This script handles the "plumbing." It creates the project and deploys the MinIO storage server.
 
-We will run a **Sweep Test**. This slowly increases the load (Requests Per Second) until the server saturates.
-
-.Create `stress-granite.yaml`
-[source,yaml]
+.Create the setup script
+[source,bash]
 ----
+cat <<EOF > setup.sh
+#!/bin/bash
+set -e
+
+# CONFIGURATION
+NAMESPACE="trustyai-lab"
+MINIO_ACCESS_KEY="minio"
+MINIO_SECRET_KEY="minio123"
+
+echo "🚀 Starting TrustyAI Lab Infrastructure..."
+
+# 1. Create Namespace
+if ! oc get project "\$NAMESPACE" > /dev/null 2>&1; then
+    echo "➤ Creating namespace \$NAMESPACE..."
+    oc new-project "\$NAMESPACE"
+else
+    echo "✔ Namespace \$NAMESPACE exists."
+fi
+
+# 2. Deploy MinIO (The Vault)
+echo "➤ Deploying MinIO..."
+# Note: In a real lab, ensure these YAMLs exist. 
+# For this fast-track, we assume standard MinIO deployment files are present 
+# or we use a simple helm/oc apply approach.
+oc apply -f deploy/infrastructure/minio/ -n "\$NAMESPACE" || echo "⚠️  Make sure MinIO YAMLs are in 'deploy/infrastructure/minio/'"
+
+# 3. Create Data Connection Secrets (Required by KServe)
+echo "➤ Wiring Data Connections..."
+oc create secret generic storage-config \\
+    --from-literal=AWS_ACCESS_KEY_ID="\$MINIO_ACCESS_KEY" \\
+    --from-literal=AWS_SECRET_ACCESS_KEY="\$MINIO_SECRET_KEY" \\
+    --from-literal=AWS_S3_ENDPOINT="http://minio-service.\$NAMESPACE.svc.cluster.local:9000" \\
+    --from-literal=AWS_DEFAULT_REGION="us-east-1" \\
+    --from-literal=AWS_S3_BUCKET="models" \\
+    -n "\$NAMESPACE" \\
+    --dry-run=client -o yaml | oc apply -f -
+
+# Label for RHOAI Dashboard Visibility
+oc label secret storage-config "opendatahub.io/dashboard=true" "opendatahub.io/managed=true" -n "\$NAMESPACE" --overwrite
+
+# Create 'models' secret for the ingestion job
+oc create secret generic models \\
+    --from-literal=AWS_ACCESS_KEY_ID="\$MINIO_ACCESS_KEY" \\
+    --from-literal=AWS_SECRET_ACCESS_KEY="\$MINIO_SECRET_KEY" \\
+    --from-literal=AWS_S3_ENDPOINT="http://minio-service.\$NAMESPACE.svc.cluster.local:9000" \\
+    --from-literal=AWS_DEFAULT_REGION="us-east-1" \\
+    --from-literal=AWS_S3_BUCKET="models" \\
+    -n "\$NAMESPACE" \\
+    --dry-run=client -o yaml | oc apply -f -
+
+echo "✅ Infrastructure Ready in namespace: \$NAMESPACE"
+EOF
+----
+
+.Run the setup
+[source,bash]
+----
+chmod +x setup.sh
+./setup.sh
+----
+
+== Step 2: Model Ingestion (`fast-track.sh`)
+
+Now that MinIO is running, we need to populate it. We will use the **Granite 3.2 2B Instruct** model because it is lightweight, fast to download, and powerful enough to demonstrate complex reasoning and toxicity risks.
+
+.Create the ingestion script
+[source,bash]
+----
+cat <<EOF > fast-track.sh
+#!/bin/bash
+set -e
+
+# CONFIGURATION
+NAMESPACE="trustyai-lab"
+MODEL_ID="ibm-granite/granite-3.2-2b-instruct"
+S3_BUCKET="models"
+S3_FOLDER="granite-3.2-2b"
+SERVICE_ACCOUNT="model-loader-sa"
+
+echo "🚀 Starting Model Ingestion for TrustyAI..."
+echo "🎯 Target: \$MODEL_ID -> s3://\$S3_BUCKET/\$S3_FOLDER"
+
+# 1. Create Service Account for the Job
+oc create sa \$SERVICE_ACCOUNT -n "\$NAMESPACE" --dry-run=client -o yaml | oc apply -f -
+oc adm policy add-scc-to-user anyuid -z \$SERVICE_ACCOUNT -n "\$NAMESPACE" > /dev/null 2>&1
+
+# 2. Define Python Ingestion Logic
+cat <<PY > /tmp/ingest_script.py
+import os
+import boto3
+from huggingface_hub import snapshot_download
+from botocore.client import Config
+
+MODEL_ID = "${MODEL_ID}"
+BUCKET = "${S3_BUCKET}"
+FOLDER = "${S3_FOLDER}"
+
+def main():
+    print(f"Downloading {MODEL_ID}...")
+    # Download specific extensions to keep image size small
+    local_dir = snapshot_download(repo_id=MODEL_ID, allow_patterns=["*.json", "*.safetensors", "*.model", "tokenizer*"])
+    
+    print(f"Uploading to MinIO ({BUCKET}/{FOLDER})...")
+    s3 = boto3.client('s3', 
+                      endpoint_url=os.getenv("AWS_S3_ENDPOINT"),
+                      aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                      aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+                      config=Config(signature_version='s3v4'))
+    
+    try: s3.create_bucket(Bucket=BUCKET)
+    except: pass
+
+    for root, _, files in os.walk(local_dir):
+        for file in files:
+            local_path = os.path.join(root, file)
+            rel_path = os.path.relpath(local_path, local_dir)
+            s3_key = os.path.join(FOLDER, rel_path)
+            print(f" -> Uploading {s3_key}")
+            s3.upload_file(local_path, BUCKET, s3_key)
+
+if __name__ == "__main__":
+    main()
+PY
+
+# 3. Create ConfigMap with the script
+oc create configmap ingestion-code --from-file=/tmp/ingest_script.py -n "\$NAMESPACE" --dry-run=client -o yaml | oc apply -f -
+
+# 4. Submit Kubernetes Job
+oc delete job model-loader -n "\$NAMESPACE" --ignore-not-found
+cat <<YAML | oc apply -f -
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: stress-test-granite
-  namespace: model-deploy-lab
+  name: model-loader
+  namespace: \$NAMESPACE
 spec:
-  backoffLimit: 0
+  backoffLimit: 1
   template:
-    metadata:
-      labels:
-        app: guidellm
     spec:
-      restartPolicy: Never
+      serviceAccountName: \$SERVICE_ACCOUNT
       containers:
-        - name: stressor
-          image: registry.access.redhat.com/ubi9/python-311:latest
-          command: ["/bin/bash", "-c"]
-          args:
-            - |
-              echo "⬇️ Installing GuideLLM..."
-              pip install guidellm --quiet
-              
-              echo "🔥 Starting Load Test..."
-              # --rate-type sweep: Increases load until performance degrades
-              # --data-type emulated: Uses synthetic data (no dataset required)
-              guidellm benchmark \
-                --target "http://granite-4-micro-predictor.model-deploy-lab.svc:8080/v1" \
-                --model "granite-4-micro" \
-                --data-type emulated \
-                --data "prompt_tokens=128,generated_tokens=128" \
-                --rate-type sweep \
-                --max-seconds 120
-          resources:
-            requests:
-              cpu: "1"
-              memory: "2Gi"
-            limits:
-              cpu: "2"
-              memory: "4Gi"
+      - name: loader
+        image: registry.access.redhat.com/ubi9/python-311:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            pip install boto3 huggingface-hub --quiet --no-cache-dir && \
+            python /scripts/ingest_script.py
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom: { secretKeyRef: { name: models, key: AWS_ACCESS_KEY_ID } }
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom: { secretKeyRef: { name: models, key: AWS_SECRET_ACCESS_KEY } }
+        - name: AWS_S3_ENDPOINT
+          valueFrom: { secretKeyRef: { name: models, key: AWS_S3_ENDPOINT } }
+        volumeMounts:
+        - name: code
+          mountPath: /scripts
+      restartPolicy: Never
+      volumes:
+      - name: code
+        configMap:
+          name: ingestion-code
+YAML
+
+echo "⏳ Ingestion Job Submitted. Run 'oc logs job/model-loader -n \$NAMESPACE -f' to monitor."
+EOF
 ----
 
-== Step 2: Execute the Benchmark
-
-. **Submit the Job:**
+.Run the ingestion
 [source,bash]
 ----
-oc apply -f stress-granite.yaml
+chmod +x fast-track.sh
+./fast-track.sh
 ----
 
-. **Wait for Completion:**
-The installation and test will take roughly 3-5 minutes.
+== Step 3: Verify Success
+
+Wait for the job to complete (approx. 2-5 minutes).
+
 [source,bash]
 ----
-oc wait --for=condition=complete job/stress-test-granite -n model-deploy-lab --timeout=300s
+oc wait --for=condition=complete job/model-loader -n trustyai-lab --timeout=300s
 ----
 
-== Step 3: Analyze the Logs
+You now have:
+1.  **Project:** `trustyai-lab`
+2.  **Storage:** MinIO with `ibm-granite/granite-3.2-2b-instruct` in the `models` bucket.
+3.  **Connection:** A `storage-config` secret ready for KServe.
 
-The results are printed to the Pod logs.
-
-. **Fetch the Report:**
-[source,bash]
-----
-oc logs job/stress-test-granite -n model-deploy-lab
-----
-
-. **Interpret the Output:**
-Look for the **Summary Table** at the bottom of the log. It will look similar to this:
-
-[source,text]
-----
-| Rate (req/s) | TTFT (ms) | ITL (ms) | Throughput (tok/s) |
-|--------------|-----------|----------|--------------------|
-| 1.0          | 45        | 12       | 128                |
-| 5.0          | 55        | 14       | 640                |
-| 10.0         | 120       | 25       | 1200               |
-| 20.0         | 450       | 80       | 1800               | <--- Saturation Point
-----
-
-=== The Engineering Decision
-1.  **Green Zone (1-5 req/s):** Latency is low (45-55ms). Excellent user experience.
-2.  **Yellow Zone (10 req/s):** Latency jumps (120ms). Acceptable for chatbots.
-3.  **Red Zone (20+ req/s):** Latency is high (450ms). The GPU is saturated.
-
-**Action:** If your Service Level Objective (SLO) is "TTFT < 200ms", your single GPU can handle **~15 users** concurrently. If you need to support 100 users, you must scale your `InferenceService` replicas from 1 to 7.
-
-xref:domain-custom.adoc[Next: The Domain Interview (Custom Checks)]
+---
+*Environment is ready. Proceed to **Module 1.1: Deploying the Shield** to install TrustyAI.*

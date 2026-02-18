@@ -1,0 +1,84 @@
+= The Architecture of Trust
+:navtitle: Architecture & Concepts
+:toc: macro
+
+// Antora metadata
+:page-role: product-concept
+:description: Deep dive into the TrustyAI architecture, Guardrails deployment patterns, and the taxonomy of AI risk.
+
+[#trustyai-arch]
+[.lead]
+*To industrialize AI, you must move from "monitoring" to "intercepting."*
+
+In a traditional MLOps pipeline, monitoring happens *after* the fact. You analyze logs at the end of the week to see if your model drifted.
+
+In the **Industrial AI Factory**, this is too late. If a GenAI model leaks PII or outputs hate speech, the damage is instantaneous. Therefore, the architecture of Red Hat OpenShift AI (RHOAI) 3.x shifts from passive observation to **active interception**.
+
+This module deconstructs the technical stack you will be building. It explains how TrustyAI sits between your users and your models to enforce the "Zero Trust" paradigm.
+
+== The Core Architecture: The "Man-in-the-Middle"
+
+TrustyAI is not a single binary; it is a set of distinct services that integrate with the **KServe** inference stack. Understanding these components is critical for the "Systems Architect" persona.
+
+
+
+=== 1. The Guardrails Orchestrator (The "Shield")
+This is the active defense layer. It functions as a proxy that intercepts every inference request.
+
+ * **Role:** It pauses the request, sends the prompt to a series of "Detectors" (e.g., Regex, Toxicity Model, PII Scanner), and waits for a verdict.
+ * **The Decision:**
+    ** **Pass:** The request is forwarded to the LLM.
+    ** **Block:** The request is rejected immediately. The LLM never sees it, saving GPU compute costs.
+ * **Deployment:** Runs as a sidecar or gateway service within the Service Mesh, ensuring mTLS encryption.
+
+=== 2. The Model Serving Runtime (The "Engine")
+This is where the actual intelligence lives (e.g., Granite-8B, Llama-3).
+
+ * **Role:** Pure inference. In this architecture, the model is "blind" to the outside world; it only accepts traffic from the Guardrails Orchestrator.
+ * **Technology:** We use **vLLM** on GPU nodes to handle the heavy lifting.
+
+=== 3. The TrustyAI Service (The "Auditor")
+This is the passive observation layer. It asynchronously consumes payload data to calculate long-term metrics.
+
+ * **Role:** It computes "drift" (how much data has changed over time) and "fairness" (bias detection).
+ * **Storage:** It writes these metrics to Prometheus for visualization in Grafana or the RHOAI dashboard.
+
+== The Taxonomy of Risk: Speaking the Language
+
+Before we configure the operator, we must define what we are measuring. "Bad AI" comes in three distinct flavors in the enterprise:
+
+[cols="1,3,1"]
+|===
+| **Risk Term** | **Definition** | **Countermeasure**
+
+| **Hallucination**
+| The model confidently generates false information (e.g., citing a court case that doesn't exist).
+| **LM-Eval (Factuality)**
+
+| **Toxicity / Jailbreak**
+| The model is tricked into generating hate speech, bomb-making instructions, or phishing emails.
+| **Guardrails (Input/Output)**
+
+| **Bias / Drift**
+| The model performs worse for a specific demographic group or degrades over time as the world changes.
+| **TrustyAI Service (Metrics)**
+|===
+
+== Up Next
+
+We are moving away from theoretical slides and into the console. You will be configuring the **TrustyAI Operator** to take full control of the cluster's AI lifecycle.
+
+By the end of this module, you will know how to:
+
+ * **Provision the TrustyAI Operator** in a "Managed" state within the `DataScienceCluster`.
+ * **Define the `LMEvalJob` Custom Resource** to run automated benchmarks.
+ * **Architect the flow** of data from a user, through the Guardrails, to the vLLM runtime.
+
+[NOTE]
+.Architecture Decision Point
+====
+In this course, we will deploy the **Guardrails Orchestrator** in "Service Mode." This decouples the guardrails from the model, allowing you to update your safety rules without restarting the heavy GPU pods running the LLM.
+====
+
+---
+*Concept check complete. Let's enter the lab.*

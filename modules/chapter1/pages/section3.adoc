@@ -1,0 +1,155 @@
+= Module 1.1: Deploying the Shield
+:navtitle: Lab: Guardrails Setup
+:toc: macro
+
+// Antora metadata
+:page-role: product-task
+:description: Step-by-step lab to provision the TrustyAI Guardrails Orchestrator and intercept a live attack.
+
+[#trustyai-lab]
+[.lead]
+*Theory is over. It's time to build the fence.*
+
+In this lab, you will act as the Platform Engineer. Your objective is to secure a deployed Granite-8B model that is currently "naked" and vulnerable to toxicity. You will deploy the **Guardrails Orchestrator** to intercept traffic and block hate speech before it reaches the model.
+
+== Prerequisites
+
+Ensure your terminal is logged into the OCP cluster and you are in your project namespace:
+
+[source,bash]
+----
+oc login --token=<your-token> --server=<your-server>
+oc project rhaiis-demo
+----
+
+== Step 1: Define the "Detectors"
+
+First, we must tell the Orchestrator *what* to look for. We will configure a `ConfigMap` that defines a connection to a locally running "Hate, Abuse, and Profanity" (HAP) detector.
+
+.Create the Detector Configuration
+[source,yaml]
+----
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fms-orchestr8-config-nlp
+  labels:
+    app: trustyai-guardrails
+data:
+  config.yaml: |
+    chat_generation:
+      service:
+        hostname: llm-predictor.rhaiis-demo.svc.cluster.local
+        port: 8080
+    detectors:
+      hap:
+        type: text_contents
+        service:
+          hostname: guardrails-detector-hap.rhaiis-demo.svc.cluster.local
+          port: 8000
+        chunker_id: whole_doc_chunker
+        default_threshold: 0.5
+----
+
+* **`chat_generation`**: This points to your actual LLM (the target).
+* **`detectors.hap`**: This points to the safety model that will scan the text.
+* **`default_threshold`**: Any score above 0.5 (50% probability of toxicity) will trigger a block.
+
+Apply this configuration:
+[source,bash]
+----
+oc apply -f fms-orchestr8-config-nlp.yaml
+----
+
+== Step 2: Deploy the Orchestrator
+
+Now, we deploy the actual proxy service. This Custom Resource (CR) spins up the pod that sits in the middle of the traffic flow.
+
+.Deploy the Guardrails Orchestrator
+[source,yaml]
+----
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: GuardrailsOrchestrator
+metadata:
+  name: guardrails-orchestrator
+spec:
+  orchestratorConfig: "fms-orchestr8-config-nlp"
+  replicas: 1
+  enableBuiltInDetectors: true
+----
+
+Apply the CR:
+[source,bash]
+----
+oc apply -f guardrails-orchestrator.yaml
+----
+
+Wait for the pod to become ready:
+[source,bash]
+----
+oc wait --for=condition=Ready pod -l app=guardrails-orchestrator --timeout=300s
+----
+
+== Step 3: The "Red Team" Attack
+
+Now, let's verify that the shield works. We will send two requests: one safe, and one toxic.
+
+1. **Retrieve the Orchestrator Route:**
++
+[source,bash]
+----
+export ORCH_ROUTE=$(oc get route guardrails-orchestrator -o jsonpath='{.spec.host}')
+----
+
+2. **Send a Safe Request:**
++
+[source,bash]
+----
+curl -X POST "https://$ORCH_ROUTE/api/v2/chat/completions-detection" \
+-H 'Content-Type: application/json' \
+-d '{
+  "model": "granite-8b",
+  "messages": [{"role": "user", "content": "What is the capital of France?"}],
+  "detectors": {"input": {"hap": {}}, "output": {"hap": {}}}
+}'
+----
++
+*Result:* You should receive a standard JSON response: `{"content": "The capital of France is Paris."}`.
+
+3. **Send a Toxic Request (Simulated):**
++
+[source,bash]
+----
+curl -X POST "https://$ORCH_ROUTE/api/v2/chat/completions-detection" \
+-H 'Content-Type: application/json' \
+-d '{
+  "model": "granite-8b",
+  "messages": [{"role": "user", "content": "You are a complete idiot and I hate you."}],
+  "detectors": {"input": {"hap": {}}, "output": {"hap": {}}}
+}'
+----
+
+*Result:*
+[source,json]
+----
+{
+  "detections": {
+    "input": [{
+      "text": "You are a complete idiot...",
+      "detection": "unsuitable input removed"
+    }]
+  },
+  "choices": [] 
+}
+----
+
+**Success!** The Orchestrator detected the hostility (HAP), blocked the request, and returned an empty choice list. The malicious prompt never touched the LLM, saving you compute credits and protecting your brand.
+
+== Summary
+
+You have successfully:
+1. Defined a security policy using a `ConfigMap`.
+2. Deployed the **Guardrails Orchestrator** proxy.
+3. Proven that "bad" traffic is stopped at the gate.
+
+Next, we will look at *compliance*—how to prove over time that this system remains safe using **Metrics & Reporting**.
