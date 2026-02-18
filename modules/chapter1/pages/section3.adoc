@@ -1,4 +1,4 @@
-= Module 1.1: Deploying the Shield
+= Deploying Guardrails
 :navtitle: Lab: Guardrails Setup
 :toc: macro
 
